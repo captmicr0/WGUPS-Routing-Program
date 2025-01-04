@@ -11,7 +11,7 @@ class HashTable:
             size: The size of the hash table. Defaults to 40.
         """
         self.size = size
-        self.table = [[] for not_used in range(self.size)]
+        self.table = [[] for _ in range(self.size)]
 
     def __str__(self):
         """
