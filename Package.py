@@ -3,7 +3,7 @@ class Package:
     Represents a package in the delivery system.
     """
     
-    def __init__(self, id, address, city, state, zip_code, deadline, weight, status="At hub"):
+    def __init__(self, id, address, city, state, zip_code, deadline, weight, status="At HUB"):
         """
         Initialize a Package object with given attributes.
 
@@ -15,7 +15,7 @@ class Package:
             zip_code: Destination ZIP code.
             deadline: Delivery deadline.
             weight: Weight of the package.
-            status: Current status of the package. Defaults to "At hub".
+            status: Current status of the package. Defaults to "At HUB".
         """
         self.id = id
         self.address = address
