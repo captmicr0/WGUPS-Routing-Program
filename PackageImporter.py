@@ -40,7 +40,7 @@ class PackageImporter:
                     row[7]) # SpecialNotes
                 self.packages.append(pkg)
 
-    def GetPackages(self):
+    def getPackages(self):
         """
         Public method to retrieve the list of imported Package objects.
 

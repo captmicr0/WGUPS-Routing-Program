@@ -41,7 +41,7 @@ class Package:
                 f"  {self.weight} KG, {self.status}, Deadline: {self.deadline}" + \
                 (len(self.special_notes) > 0 and f", Notes: {self.special_notes}" or "")
     
-    def update_status(self, status, time=None):
+    def updateStatus(self, status, time=None):
         """
         Update the status of the package and set delivery time if delivered.
 
@@ -52,3 +52,18 @@ class Package:
         self.status = status
         if status == "Delivered":
             self.delivery_time = time
+
+    def updateAddress(self, address, city, state, zip_code):
+        """
+        Update the address of the package.
+
+        Args:
+            address: New address of the package.
+            city: New city of the package.
+            state: New state of the package.
+            zip_code: New ZIP code of the package.
+        """
+        self.address = address
+        self.city = city
+        self.state = state
+        self.zip_code = zip_code

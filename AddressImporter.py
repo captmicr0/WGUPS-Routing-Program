@@ -62,6 +62,17 @@ class AddressImporter:
                         self.distances[y][x] = float(row_dist[x])
                         self.distances[x][y] = float(row_dist[x]) # Mirror the distance value
                 y += 1
+    
+    def distance(self, addr1, addr2):
+        """
+        Public method to get the distances between two addresses
+
+        Returns:
+            The distance between two addresses
+        """
+        addr1_index = self.addresses.index(addr1)
+        addr2_index = self.addresses.index(addr2)
+        return self.distances[addr1_index][addr2_index]
 
 # Test the AddressImporter class
 if __name__ == "__main__":

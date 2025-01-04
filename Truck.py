@@ -23,7 +23,7 @@ class Truck:
         self.capacity = capacity
         self.current_location = "HUB"
     
-    def load_package(self, package):
+    def loadPackage(self, package):
         """
         Load a package onto the truck if there's available capacity.
 
@@ -38,7 +38,7 @@ class Truck:
             return True
         return False
     
-    def deliver_package(self, package, distance):
+    def deliverPackage(self, package, distance):
         """
         Deliver a package and update truck's status.
 
@@ -53,7 +53,7 @@ class Truck:
         self.package.remove(package)
         self.current_location = package.address
 
-    def return_to_hub(self, distance_to_hub):
+    def returnToHub(self, distance_to_hub):
         """
         Return truck to HUB
 
