@@ -52,3 +52,15 @@ class Truck:
         package.update_status("Delivered", self.current_time)
         self.package.remove(package)
         self.current_location = package.address
+
+    def return_to_hub(self, distance_to_hub):
+        """
+        Return truck to HUB
+
+        Args:
+            distance_to_hub: The distance to the delivery HUB in miles.
+        """
+        travel_time = distance_to_hub / self.speed
+        self.current_time += timedelta(hours=travel_time)
+        self.mileage += distance_to_hub
+        self.current_location = "HUB"
