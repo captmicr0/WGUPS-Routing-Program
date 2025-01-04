@@ -12,6 +12,16 @@ class HashTable:
         """
         self.size = size
         self.table = [[] for not_used in range(self.size)]
+
+    def __str__(self):
+        """
+        Return a string representation of the hash table.
+
+        Returns:
+            A string representation of the hash table's contents.
+        """
+        return str(self.table)
+
     
     def _hash(self, key):
         """
@@ -57,12 +67,3 @@ class HashTable:
             if item[0] == key:
                 return item[1]
         return None
-
-    def __str__(self):
-        """
-        Return a string representation of the hash table.
-
-        Returns:
-            A string representation of the hash table's contents.
-        """
-        return str(self.table)
