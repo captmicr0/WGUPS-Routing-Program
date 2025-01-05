@@ -26,6 +26,30 @@ class PackageLoader:
     
     def _assignPackages(self):
         pass
+
+    def _getLoadable(self, truck):
+        """
+        Get all packages that are able to be loaded onto the given truck
+
+        Args:
+            truck: Truck to load packages onto
+        
+        Returns:
+            A list of package list that can be loaded onto the truck
+        """
+        pass
+
+    def _getUnloadable(self, truck):
+        """
+        Get all packages that are NOT able to be loaded onto the given truck
+
+        Args:
+            truck: Truck to load packages onto
+        
+        Returns:
+            A list of package list that can NOT be loaded onto the truck
+        """
+        pass
     
     def _getPackageDependencies(self):
         """
