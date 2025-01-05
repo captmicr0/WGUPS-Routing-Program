@@ -24,6 +24,18 @@ class Driver:
         """
         return f"Driver #{self.id}, Assigned Truck #{self.truck.id}"
     
+    def __repr__(self):
+        """
+        Return a string representation of the Driver object.
+
+        This method provides a concise representation of the Driver,
+        which is useful for debugging and logging purposes.
+
+        Returns:
+            A string representation of the Driver object, including its ID.
+        """
+        return f"Driver(id={self.id})"
+    
     def assignTruck(self, availableTrucks):
         """
         Assign a truck to the driver.

@@ -26,15 +26,27 @@ class Truck:
     
     def __str__(self):
         """
-        Return a string representation of the Driver.
+        Return a string representation of the Truck.
 
         Returns:
-            A string representation of the Driver.
+            A string representation of the Truck.
         """
         return f"Truck #{self.id}, Assigned Driver: {self.driver.id}\n" + \
                 f"  Speed {self.speed}, Capacity: {self.capacity}\n" + \
                 f"  Mileage: {self.mileage}, Current Time: {(datetime.min + self.current_time).strftime("%H:%M")}\n"+ \
                 f"  Location: {self.current_location}"
+    
+    def __repr__(self):
+        """
+        Return a string representation of the Truck object.
+
+        This method provides a concise representation of the Truck,
+        which is useful for debugging and logging purposes.
+
+        Returns:
+            A string representation of the Truck object, including its ID.
+        """
+        return f"Truck(id={self.id})"
     
     def loadPackage(self, pkgHashTable, packageID):
         """

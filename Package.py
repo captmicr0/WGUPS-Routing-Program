@@ -47,6 +47,15 @@ class Package:
                 '\n'.join([f"    {(x[1]) and (datetime.min + x[1]).strftime("%H:%M") or "??:??"}: {x[0]}" for x in self.status])
     
     def __repr__(self):
+        """
+        Return a string representation of the Package object.
+
+        This method provides a concise representation of the Package,
+        which is useful for debugging and logging purposes.
+
+        Returns:
+            A string representation of the Package object, including its ID.
+        """
         return f"Package(id={self.id})"
     
     def updateStatus(self, status, time=None):
