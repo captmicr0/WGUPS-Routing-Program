@@ -25,8 +25,7 @@ class Package:
         self.zip_code = zip_code
         self.deadline = deadline
         self.weight = weight
-        self.status = status
-        self.delivery_time = None
+        self.status = [[status,None]]
         self.special_notes = special_notes
     
     def __str__(self):
@@ -38,20 +37,19 @@ class Package:
         """
         return f"Package {self.id}:\n" + \
                 f"  {self.address}, {self.city}, {self.state} {self.zip_code}\n" + \
-                f"  {self.weight} KG, {self.status}, Deadline: {self.deadline}" + \
-                (len(self.special_notes) > 0 and f", Notes: {self.special_notes}" or "")
+                f"  {self.weight} KG, Deadline: {self.deadline}" + \
+                (len(self.special_notes) > 0 and f", Notes: {self.special_notes}\n" or "\n") + \
+                '\n'.join([f"  {(x[1]) and x[1].strftime('%H:%M') or "??:??"}: {x[0]}" for x in self.status])
     
     def updateStatus(self, status, time=None):
         """
-        Update the status of the package and set delivery time if delivered.
+        Update the status of the package with timestamp.
 
         Args:
             status: New status of the package.
-            time: Time of delivery, required if status is "Delivered".
+            time: Time of status update
         """
-        self.status = status
-        if status == "Delivered":
-            self.delivery_time = time
+        self.status.append([status, time])
 
     def updateAddress(self, address, city, state, zip_code):
         """

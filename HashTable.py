@@ -35,7 +35,7 @@ class HashTable:
         """
         return hash(key) % self.size
 
-    def insert(self, key, value):
+    def insert(self, pkg):
         """
         Insert a key-value pair into the hash table.
 
@@ -45,14 +45,14 @@ class HashTable:
             key: The key to be inserted.
             value: The value associated with the key.
         """
-        hash_key = self._hash(key)
+        hash_key = self._hash(pkg.id)
         for item in self.table[hash_key]:
-            if item[0] == key:
-                item[1] == value
+            if item[0] == pkg.id:
+                item[1] == pkg
                 return
-        self.table[hash_key].append([key, value])
+        self.table[hash_key].append([pkg.id, pkg])
 
-    def lookup(self, key):
+    def lookup(self, pkgID):
         """
         Look up a value in the hash table by its key.
 
@@ -62,8 +62,8 @@ class HashTable:
         Returns:
             The value associated with the key, or None if the key is not found.
         """
-        hash_key = self._hash(key)
+        hash_key = self._hash(pkgID)
         for item in self.table[hash_key]:
-            if item[0] == key:
+            if item[0] == pkgID:
                 return item[1]
         return None
