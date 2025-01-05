@@ -35,4 +35,3 @@ for pkg in pkgImporter.getPackages():
 # Create SortingLoader instance
 sortingLoader = SortingLoader(addressImporter, pkgHashTable)
 
-print(sortingLoader.pkgDependencies)
