@@ -6,7 +6,7 @@ class Package:
     Represents a package in the delivery system.
     """
     
-    def __init__(self, id, address, city, state, zip_code, deadline, weight, special_notes="", status="At HUB"):
+    def __init__(self, id, address, city, state, zip_code, deadline, weight, special_notes="", status="At HUB", status_time=timedelta(hours=7, minutes=00)):
         """
         Initialize a Package object with given attributes.
 
@@ -18,8 +18,9 @@ class Package:
             zip_code: Destination ZIP code.
             deadline: Delivery deadline.
             weight: Weight of the package.
-            status: Current status of the package. Defaults to "At HUB".
             special_notes: Any addition information about the package. Defaults to blank string.
+            status: Current status of the package. Defaults to "At HUB".
+            status_time: Current status time. Defaults to 7:00 AM.
         """
         self.id = id
         self.address = address
@@ -28,7 +29,7 @@ class Package:
         self.zip_code = zip_code
         self.deadline = deadline
         self.weight = weight
-        self.status = [[status,None]]
+        self.status = [[status,status_time]]
         self.special_notes = special_notes
     
     def __str__(self):
@@ -40,10 +41,10 @@ class Package:
         """
         return f"Package {self.id}:\n" + \
                 f"  {self.address}, {self.city}, {self.state} {self.zip_code}\n" + \
-                f"  {self.weight} KG, Deadline: {self.deadline and self.deadline or "EOD"}" + \
+                f"  {self.weight} KG, Deadline: {self.deadline and (datetime.min + self.deadline).strftime('%H:%M') or "EOD"}" + \
                 (len(self.special_notes) > 0 and f", Notes: {self.special_notes}\n" or "\n") + \
                 f"  Tracking History:\n" + \
-                '\n'.join([f"    {(x[1]) and (datetime.min + x[1]).strftime('%H:%M') or "??:??"}: {x[0]}" for x in self.status])
+                '\n'.join([f"    {(x[1]) and (datetime.min + x[1]).strftime("%H:%M") or "??:??"}: {x[0]}" for x in self.status])
     
     def updateStatus(self, status, time=None):
         """
@@ -56,8 +57,10 @@ class Package:
         self.status.append([status, time])
     
     def isOnTruck(self):
-        return any(['Loaded on truck' in x[0] for x in self.status])
+        return any(["Loaded on truck" in x[0] for x in self.status])
 
+    def isDelivered(self):
+        return "Delivered" in self.status[-1][0]
     
     def getRequiredTruckID(self):
         notes = self.special_notes
