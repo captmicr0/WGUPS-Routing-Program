@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 class Package:
     """
     Represents a package in the delivery system.
@@ -39,7 +41,7 @@ class Package:
                 f"  {self.address}, {self.city}, {self.state} {self.zip_code}\n" + \
                 f"  {self.weight} KG, Deadline: {self.deadline}" + \
                 (len(self.special_notes) > 0 and f", Notes: {self.special_notes}\n" or "\n") + \
-                '\n'.join([f"  {(x[1]) and x[1].strftime('%H:%M') or "??:??"}: {x[0]}" for x in self.status])
+                '\n'.join([f"  {(x[1]) and (datetime.min + x[1]).strftime('%H:%M') or "??:??"}: {x[0]}" for x in self.status]) + "\n"
     
     def updateStatus(self, status, time=None):
         """
@@ -50,6 +52,9 @@ class Package:
             time: Time of status update
         """
         self.status.append([status, time])
+    
+    def isOnTruck(self):
+        return any(['Loaded on truck' in x[0] for x in self.status])
 
     def updateAddress(self, address, city, state, zip_code):
         """

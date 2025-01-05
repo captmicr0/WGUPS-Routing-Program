@@ -15,6 +15,11 @@ from Package import Package
 NUM_TRUCKS = 3
 NUM_DRIVERS = 2
 
+# Initialize Trucks and Drivers
+NUM_MIN = min(NUM_TRUCKS, NUM_DRIVERS) # Since Drivers stay with their assigned Truck, extras are not used
+trucks = [Truck(id, timedelta(hours=8, minutes=0, seconds=0)) for id in range(1, NUM_MIN + 1)]
+drivers = [Driver(id, trucks) for id in range(1, NUM_MIN + 1)]
+print(trucks[0])
 # Import Packages from the csv file and insert them into the HashTable
 pkgImporter = PackageImporter('packages.csv')
 pkgHashTable = HashTable(len(pkgImporter.getPackages()))
@@ -44,7 +49,6 @@ def getPackageDependencies(package):
     Returns:
         A list of directly related packages that must be delivered together
     """
-    print("GetDep", package)
     notes = package.special_notes
 
     if "Must be delivered with" in notes:
@@ -67,9 +71,5 @@ def getRequiredTruckID(self, pkgID):
     notes = pkgHashTable.lookup(pkgID).special_notes
     if "Can only be on truck" in notes:
         return int(notes.split()[-1])
-    if "Must be delivered with" in notes:
-        pass
     return None
 
-pkg = pkgHashTable.lookup(16)
-print(getPackageDependencies(pkg))

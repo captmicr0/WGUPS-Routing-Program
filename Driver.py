@@ -2,7 +2,7 @@ class Driver:
     """
     Represents a driver in the delivery system.
     """
-    def __init__(self, id, truck=None):
+    def __init__(self, id, availableTrucks=None):
         """
         Initialize a Driver object.
 
@@ -11,9 +11,20 @@ class Driver:
             truck: The truck assigned to the driver. Defaults to None.
         """
         self.id = id
-        self.truck = truck
+        self.truck = None
+        if availableTrucks:
+            self.assignTruck(availableTrucks)
     
-    def assignTruck(self, truck):
+    def __str__(self):
+        """
+        Return a string representation of the Driver.
+
+        Returns:
+            A string representation of the Driver.
+        """
+        return f"Driver #{self.id}, Assigned Truck #{self.truck.id}"
+    
+    def assignTruck(self, availableTrucks):
         """
         Assign a truck to the driver.
 
@@ -21,11 +32,14 @@ class Driver:
             truck: The truck to be assigned to the driver.
 
         Returns:
-            Always returns True, indicating successful assignment.
+            True if assignment successful, False otherwise.
         """
-        truck.driver = self
-        self.truck = truck
-        return True
+        for truck in availableTrucks:
+            if truck.driver is None:
+                truck.driver = self
+                self.truck = truck
+                return True
+        return False
     
     def removeTruck(self):
         """

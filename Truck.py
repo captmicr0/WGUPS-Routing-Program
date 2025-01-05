@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 class Truck:
     """
@@ -23,6 +23,18 @@ class Truck:
         self.capacity = capacity
         self.current_location = "HUB"
         self.driver = None
+    
+    def __str__(self):
+        """
+        Return a string representation of the Driver.
+
+        Returns:
+            A string representation of the Driver.
+        """
+        return f"Truck #{self.id}, Assigned Driver: {self.driver.id}\n" + \
+                f"  Speed {self.speed}, Capacity: {self.capacity}\n" + \
+                f"  Mileage: {self.mileage}, Current Time: {(datetime.min + self.current_time).strftime("%H:%M")}\n"+ \
+                f"  Location: {self.current_location}\n"
     
     def loadPackage(self, pkgHashTable, packageID):
         """
