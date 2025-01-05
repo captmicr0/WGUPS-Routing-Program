@@ -1,33 +1,81 @@
-from datetime import datetime, timedelta
-
-from Driver import Driver
-from Truck import Truck
-
-from HashTable import HashTable
-from Package import Package
-
-class PackageLoader:
+class SortingLoader:
     """
-    An implementation to load packages onto trucks. Handles special notes,
-    such as combined delivery, delays, and wrong addresses
+    An implementation to sort and load packages onto trucks.
+    Handles special cases such as combined delivery, delays, and wrong addresses.
     """
 
-    def __init__(self, trucks, pkgHashTable):
+    def __init__(self, addressImporter, pkgHashTable):
         """
-        Initialize a PackageLoader object with given attributes.
+        Initialize a SortingLoader object with given attributes.
 
         Args:
             trucks: Avaiable Trucks to load packages onto
             pkgHashTable: The hashTable containing all packages.
         """
-        self.trucks = trucks
+        self.addressImporter = addressImporter
         self.pkgHashTable = pkgHashTable
         self.pkgDependencies = self._getPackageDependencies()
     
-    def _assignPackages(self):
-        pass
+    def loadPackagesOntoTruck(self, truck):
+        # Load packages until the Truck is at capacity
+        loadablePkgs = self._getLoadablePackages(truck)
+        while (truck.current_location=="HUB") and (len(loadablePkgs) > 0) and (not truck.isFull()):
+            address = None
 
-    def _getLoadable(self, truck):
+            # Set address to HUB if truck is empty
+            if len(truck.packageIDs) == 0:
+                address = "HUB"
+            else:
+                lastPkg = self.pkgHashTable.lookup(truck.packageIDs[-1])
+                address = lastPkg.address
+
+            # Load the closest package to the previous address
+            nearestPkg = self._findClosestPackage(address, loadablePkgs)
+            truck.loadPackage(self.pkgHashTable, nearestPkg.id)
+
+            # If package ID is 9, update address
+            # This will only happen when the truck is able to load the package,
+            # after 10:20 AM when the correect address is known
+            if nearestPkg.id == 9:
+                nearestPkg.updateAddress("410 S State St", "Salt Lake City", "UT", 84111)
+                # Resort, since the route will change due to the new address
+                self._resortTruckPacakges(truck)
+            
+            # Check for any dependent packages and load them
+            for subList in self.pkgDependencies:
+                if nearestPkg in subList:
+                    for dependentPkg in subList:
+                        if not dependentPkg.isOnTruck():
+                            truck.loadPackage(self.pkgHashTable, dependentPkg.id)
+                    # Resort, since the dependent packages were not added in a sorted manner
+                    self._resortTruckPacakges(truck)
+    
+    def _resortTruckPacakges(self, truck):
+        sortedIDs = []
+        current_address = "HUB"
+        packages = [self.pkgHashTable.lookup(id) for id in truck.packageIDs]
+
+        while len(packages) >= 0:
+            nnPackage = self._findClosestPackage(current_address, packages)
+            sortedIDs.append(nnPackage.id)
+            current_address = nnPackage.address
+            packages.remove(nnPackage)
+        
+        truck.packageIDs = sortedIDs
+
+    def _findClosestPackage(self, current_address, packages):
+        nnPackage = None
+        nnDistance = 100000 # Some impossible distance
+
+        for pkg in packages:
+            distance = self.addressImporter.distance(pkg.address, current_address)
+            if distance < nnDistance:
+                nnPackage = pkg
+                nnDistance = distance
+        
+        return nnPackage
+
+    def _getLoadablePackages(self, truck):
         """
         Get all packages that are able to be loaded onto the given truck
 
@@ -37,9 +85,32 @@ class PackageLoader:
         Returns:
             A list of package list that can be loaded onto the truck
         """
-        pass
+        unloadablePkgs = self._getUnloadablePackages()
+        loadablePkgs = []
 
-    def _getUnloadable(self, truck):
+        for pkg in self._getUnloadedPackages():
+            if pkg not in unloadablePkgs:
+                loadablePkgs.append(pkg)
+        
+        return loadablePkgs
+
+    def _getUnloadedPackages(self):
+        """
+        Get all packages that are NOT loaded onto a truck
+        
+        Returns:
+            A list of packages that are NOT loaded onto a truck
+        """
+        unloadedPkgs = []
+
+        for bucket in self.pkgHashTable.table:
+            for _, pkg in bucket:
+                if not pkg.isOnTruck():
+                    unloadedPkgs.append(pkg)
+        
+        return unloadedPkgs
+
+    def _getUnloadablePackages(self, truck):
         """
         Get all packages that are NOT able to be loaded onto the given truck
 

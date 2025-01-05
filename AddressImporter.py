@@ -70,6 +70,12 @@ class AddressImporter:
         Returns:
             The distance between two addresses
         """
+        # Handle HUB address
+        if addr1 == "HUB":
+            addr1 = "4001 South 700 East"
+        if addr2 == "HUB":
+            addr2 = "4001 South 700 East"
+        # Get distance between the two addresses
         addr1_index = self.addresses.index(addr1)
         addr2_index = self.addresses.index(addr2)
         return self.distances[addr1_index][addr2_index]

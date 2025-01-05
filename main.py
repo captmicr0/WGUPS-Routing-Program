@@ -11,7 +11,7 @@ from Truck import Truck
 from HashTable import HashTable
 from Package import Package
 
-from PackageLoader import PackageLoader
+from SortingLoader import PackageLoader
 
 # Number of Trucks and Drivers in the delivery system
 NUM_TRUCKS = 3
@@ -22,6 +22,9 @@ NUM_MIN = min(NUM_TRUCKS, NUM_DRIVERS) # Since Drivers stay with their assigned 
 trucks = [Truck(id, timedelta(hours=8, minutes=0, seconds=0)) for id in range(1, NUM_MIN + 1)]
 drivers = [Driver(id, trucks) for id in range(1, NUM_MIN + 1)]
 
+# Import addresses and distances from the csv file
+addressImporter = AddressImporter('addresses.csv')
+
 # Import Packages from the csv file and insert them into the HashTable
 pkgImporter = PackageImporter('packages.csv')
 pkgHashTable = HashTable(10)
@@ -29,6 +32,6 @@ pkgHashTable = HashTable(10)
 for pkg in pkgImporter.getPackages():
     pkgHashTable.insert(pkg)
 
-# Create PackageLoader instance
-pkgLoader = PackageLoader(trucks, pkgHashTable)
+# Create SortingLoader instance
+SortingLoader = PackageLoader(pkgHashTable)
 
