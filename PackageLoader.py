@@ -49,7 +49,33 @@ class PackageLoader:
         Returns:
             A list of package list that can NOT be loaded onto the truck
         """
-        pass
+        unloadablePkgs = []
+        
+        for bucket in self.pkgHashTable.table:
+            for _, pkg in bucket:
+                # If the package is already loaded onto a truck, add it to the list
+                if pkg.isOnTruck():
+                    unloadablePkgs.append(pkg)
+                
+                # Handle delayed packages
+                elif (pkg.getRequiredTruckID() is not None) and (pkg.getRequiredTruckID() != truck.id):
+                    if pkg not in unloadablePkgs:
+                        unloadablePkgs.append(pkg)
+                
+                # Handle packages that need to be on a specific truck
+                elif (pkg.getArrivalTime() is not None) and (pkg.getArrivalTime() >= truck.current_time):
+                    unloadablePkgs.append(pkg)
+
+                    # Make sure any dependent packages are unloadable aswell
+                    for subList in self.pkgDependencies:
+                        # Does the package have an dependencies?
+                        if pkg in subList:
+                            # Add all of them to the unloadable list if they aren't already
+                            for dependentPkg in subList:
+                                if dependentPkg not in unloadablePkgs:
+                                    unloadablePkgs.append(dependentPkg)
+        
+        return unloadablePkgs
     
     def _getPackageDependencies(self):
         """

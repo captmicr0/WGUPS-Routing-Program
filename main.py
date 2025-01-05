@@ -32,4 +32,3 @@ for pkg in pkgImporter.getPackages():
 # Create PackageLoader instance
 pkgLoader = PackageLoader(trucks, pkgHashTable)
 
-print(pkgHashTable.lookup(3))
