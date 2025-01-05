@@ -57,18 +57,42 @@ class Package:
         self.status.append([status, time])
     
     def isOnTruck(self):
+        """
+        Check if the package is currently loaded on a truck.
+
+        Returns:
+            True if the package is on a truck, False otherwise.
+        """
         return any(["Loaded on truck" in x[0] for x in self.status])
 
     def isDelivered(self):
+        """
+        Check if the package has been delivered.
+
+        Returns:
+            True if the package is delivered, False otherwise.
+        """
         return "Delivered" in self.status[-1][0]
     
     def getRequiredTruckID(self):
+        """
+        Get the required truck ID for the package, if specified in special notes.
+
+        Returns:
+            The required truck ID, or None if not specified.
+        """
         notes = self.special_notes
         if "Can only be on truck" in notes:
             return int(notes.split()[-1])
         return None
 
     def getArrivalTime(self):
+        """
+        Get the arrival time of the package at the depot, if delayed.
+
+        Returns:
+            The arrival time as a timedelta object, or None if not delayed.
+        """
         notes = self.special_notes
         # Handle delayed packages
         if "Delayed on flight---will not arrive to depot until" in notes:
