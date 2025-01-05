@@ -40,7 +40,7 @@ class AddressImporter:
                 self.addr_names.append(name_match.group(1))
                 # Add formatted address to list
                 addr_match = re.search(addr_pattern, row[1], re.MULTILINE)
-                self.addresses.append(f"{addr_match.group(1)} {addr_match.group(2)}")
+                self.addresses.append(f"{self._normalize_address(addr_match.group(1))} {self._normalize_address(addr_match.group(2))}")
                 # Increment address counter
                 self.count += 1
     
@@ -76,9 +76,14 @@ class AddressImporter:
         if addr2 == "HUB":
             addr2 = "4001 South 700 East"
         # Get distance between the two addresses
+        addr1 = self._normalize_address(addr1)
+        addr2 = self._normalize_address(addr2)
         addr1_index = self.addresses.index(addr1)
         addr2_index = self.addresses.index(addr2)
         return self.distances[addr1_index][addr2_index]
+    
+    def _normalize_address(self, addr):
+        return addr.lower().replace('south','s').replace('west','w').replace('north','n').replace('east','e')
 
 # Test the AddressImporter class
 if __name__ == "__main__":

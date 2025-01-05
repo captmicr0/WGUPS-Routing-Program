@@ -60,4 +60,13 @@ class InfoUI:
         input("\nPress ENTER to return to the Main Menu...")
     
     def _clear(self):
+        """
+        Clear the console screen.
+
+        This method uses ANSI escape codes to clear the console screen:
+        - \033[H moves the cursor to the top-left corner of the screen
+        - \033[J clears the screen from the cursor position to the end
+        
+        Note: This method may not work on all operating systems or terminals.
+        """
         print("\033[H\033[J", end="")

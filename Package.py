@@ -85,7 +85,8 @@ class Package:
         Returns:
             True if the package is delivered, False otherwise.
         """
-        return "Delivered" in self.status[-1][0]
+        #return "Delivered" in self.status[-1][0]
+        return any(["Delivered" in x[0] for x in self.status])
     
     def getRequiredTruckID(self):
         """

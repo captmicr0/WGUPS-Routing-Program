@@ -1,4 +1,4 @@
-class SortingLoader:
+class Routing:
     """
     An implementation to sort and load packages onto trucks.
     Handles special cases such as combined delivery, delays, and wrong addresses.
@@ -6,7 +6,7 @@ class SortingLoader:
 
     def __init__(self, addressImporter, pkgHashTable):
         """
-        Initialize a SortingLoader object with given attributes.
+        Initialize a Routing object with given attributes.
 
         Args:
             trucks: Avaiable Trucks to load packages onto
@@ -15,6 +15,43 @@ class SortingLoader:
         self.addressImporter = addressImporter
         self.pkgHashTable = pkgHashTable
         self.pkgDependencies = self._getPackageDependencies()
+    
+    def deliverPackages(self, trucks):
+        # Loop until all packages are delivered
+        while not self._allPackagesDelivered():
+            # Deliver packages for each truck
+            for truck in trucks:
+                current_address = "HUB"
+
+                # Update status of all packages loaded on truck to "En route"
+                truck.updatePackagesStatus(self.pkgHashTable, "En route")
+
+                # Deliver all packages
+                while len(truck.packageIDs) > 0:
+                    # Get first item in packageID list
+                    # Note: When a package is delivered, it's removed from the list
+                    pkgID = truck.packageIDs[0]
+                    pkg = self.pkgHashTable.lookup(pkgID)
+
+                    # Get the distance between the current address and delivery address
+                    distance = self.addressImporter.distance(current_address, pkg.address)
+
+                    # Delivery the package
+                    truck.deliverPackage(self.pkgHashTable, pkgID, distance)
+
+                    # Update the current address
+                    current_address = pkg.address
+
+                # Return to HUB
+                distance = self.addressImporter.distance(current_address, "HUB")
+                truck.returnToHub(distance)
+            
+            # If any packages remain, load them onto the truck
+            for truck in trucks:
+                self.loadPackagesOntoTruck(truck)
+    
+    def _allPackagesDelivered(self):
+        return all([pkg.isDelivered() for bucket in self.pkgHashTable.table for _, pkg in bucket])
     
     def loadPackagesOntoTruck(self, truck):
         """
@@ -25,7 +62,7 @@ class SortingLoader:
         """
         # Load packages until the Truck is at capacity
         loadablePkgs = self._getLoadablePackages(truck)
-        while (truck.current_location=="HUB") and (len(loadablePkgs) > 0) and (not truck.isFull()):
+        while (truck.current_location == "HUB") and (len(loadablePkgs) > 0) and (not truck.isFull()):
             address = None
 
             # Set address to HUB if truck is empty
@@ -67,7 +104,7 @@ class SortingLoader:
         current_address = "HUB"
         packages = [self.pkgHashTable.lookup(id) for id in truck.packageIDs]
 
-        while len(packages) >= 0:
+        while len(packages) > 0:
             nnPackage = self._findClosestPackage(current_address, packages)
             sortedIDs.append(nnPackage.id)
             current_address = nnPackage.address
@@ -86,16 +123,15 @@ class SortingLoader:
         Returns:
             The package closest to the current address.
         """
-        nnPackage = None
-        nnDistance = 100000 # Some impossible distance
 
-        for pkg in packages:
-            distance = self.addressImporter.distance(pkg.address, current_address)
-            if distance < nnDistance:
-                nnPackage = pkg
-                nnDistance = distance
-        
-        return nnPackage
+        if not packages:
+            return None
+
+        # Uses Python's built-in min function with a key parameter to find the package with the minimum distance.
+        return min(
+            packages,
+            key=lambda pkg: self.addressImporter.distance(pkg.address, current_address)
+        )
 
     def _getLoadablePackages(self, truck):
         """
@@ -107,7 +143,7 @@ class SortingLoader:
         Returns:
             A list of package list that can be loaded onto the truck
         """
-        unloadablePkgs = self._getUnloadablePackages()
+        unloadablePkgs = self._getUnloadablePackages(truck)
         
         return [pkg for pkg in self._getUnloadedPackages() if pkg not in unloadablePkgs]
 
