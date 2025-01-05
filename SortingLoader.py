@@ -17,6 +17,12 @@ class SortingLoader:
         self.pkgDependencies = self._getPackageDependencies()
     
     def loadPackagesOntoTruck(self, truck):
+        """
+        Load packages onto the given truck.
+
+        Args:
+            truck: The truck to load packages onto.
+        """
         # Load packages until the Truck is at capacity
         loadablePkgs = self._getLoadablePackages(truck)
         while (truck.current_location=="HUB") and (len(loadablePkgs) > 0) and (not truck.isFull()):
@@ -51,6 +57,12 @@ class SortingLoader:
                     self._resortTruckPacakges(truck)
     
     def _resortTruckPacakges(self, truck):
+        """
+        Resort packages on the truck based on nearest neighbor algorithm.
+
+        Args:
+            truck: The truck whose packages need to be resorted.
+        """
         sortedIDs = []
         current_address = "HUB"
         packages = [self.pkgHashTable.lookup(id) for id in truck.packageIDs]
@@ -64,6 +76,16 @@ class SortingLoader:
         truck.packageIDs = sortedIDs
 
     def _findClosestPackage(self, current_address, packages):
+        """
+        Find the closest package to the current address.
+
+        Args:
+            current_address: The current address to compare against.
+            packages: List of packages to search through.
+
+        Returns:
+            The package closest to the current address.
+        """
         nnPackage = None
         nnDistance = 100000 # Some impossible distance
 
@@ -150,63 +172,51 @@ class SortingLoader:
     
     def _getPackageDependencies(self):
         """
-        Get list of all packages that must be delivered together
+        Get list of all packages that must be delivered together.
 
         Returns:
-            A list of package list that must be delivered together
+            A list of package lists that must be delivered together.
         """
         masterList = []
-
         for bucket in self.pkgHashTable.table:
             for _, pkg in bucket:
                 if pkg and "Must be delivered with" in pkg.special_notes:
-                    # Get list of packages that must be delivered with the current package
                     pkgDependencies = self._getPackageSubDependencies(pkg)
-
-                    combineList = None
-
-                    # Check if any of those packages are already in an list 
-                    for dependency in pkgDependencies:
-                        for idx, subList in enumerate(masterList):
-                            if dependency in subList:
-                                combineList = subList
-                                break
-
-                    # If any package is already in a list, append all dependencies to that list
-                    if combineList:
-                        for dependency in pkgDependencies:
-                            if dependency not in combineList:
-                                combineList.append(dependency)
-                    # Otherwise, add all dependencies to a new list
-                    else:
-                        masterList.append(pkgDependencies)
-        
+                    self._updateMasterList(masterList, pkgDependencies)
         return masterList
 
     def _getPackageSubDependencies(self, package):
         """
-        Parse packages special notes and get a list of directly related packages
+        Parse package's special notes and get a list of directly related packages.
 
         Args:
-            package: The initial package
-        
+            package: The initial package.
+
         Returns:
-            A list of packages that must be delivered with the initial package
+            A list of packages that must be delivered with the initial package.
         """
         notes = package.special_notes
-
         if "Must be delivered with" in notes:
             pkgDependencies = [package]
-
-            # Get IDs of other packages that must be delivered with the given package
-            IDs = [int(x) for x in notes.replace(',',' ').split() if x.isdigit()]
-
-            # Append IDs aof additional packages that must be delivered with above packages
+            IDs = [int(x) for x in notes.replace(',', ' ').split() if x.isdigit()]
             for pkgID in IDs:
                 pkg = self.pkgHashTable.lookup(pkgID)
                 pkgDependencies.append(pkg)
                 additionalPkgs = self._getPackageSubDependencies(pkg)
                 if additionalPkgs is not None:
                     pkgDependencies.extend(additionalPkgs)
-
             return pkgDependencies
+
+    def _updateMasterList(self, masterList, pkgDependencies):
+        """
+        Update the master list of package dependencies.
+
+        Args:
+            masterList: The current master list of package dependencies.
+            pkgDependencies: New package dependencies to be added or merged.
+        """
+        combineList = next((subList for subList in masterList if any(dep in subList for dep in pkgDependencies)), None)
+        if combineList:
+            combineList.extend([dep for dep in pkgDependencies if dep not in combineList])
+        else:
+            masterList.append(pkgDependencies)
