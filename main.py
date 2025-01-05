@@ -33,6 +33,6 @@ for pkg in pkgImporter.getPackages():
     pkgHashTable.insert(pkg)
 
 # Create SortingLoader instance
-sortingLoader = SortingLoader(pkgHashTable)
+sortingLoader = SortingLoader(addressImporter, pkgHashTable)
 
 print(sortingLoader.pkgDependencies)

@@ -123,14 +123,7 @@ class SortingLoader:
         Returns:
             A list of packages that are NOT loaded onto a truck
         """
-        unloadedPkgs = []
-
-        for bucket in self.pkgHashTable.table:
-            for _, pkg in bucket:
-                if not pkg.isOnTruck():
-                    unloadedPkgs.append(pkg)
-        
-        return unloadedPkgs
+        return [pkg for bucket in self.pkgHashTable.table for _, pkg in bucket if not pkg.isOnTruck()]
 
     def _getUnloadablePackages(self, truck):
         """
