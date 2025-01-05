@@ -7,6 +7,11 @@ from HashTable import HashTable
 from Package import Package
 
 class PackageLoader:
+    """
+    An implementation to load packages onto trucks. Handles special notes,
+    such as combined delivery, delays, and wrong addresses
+    """
+
     def __init__(self, trucks, pkgHashTable):
         """
         Initialize a PackageLoader object with given attributes.
@@ -18,6 +23,9 @@ class PackageLoader:
         self.trucks = trucks
         self.pkgHashTable = pkgHashTable
         self.pkgDependencies = self._getPackageDependencies()
+    
+    def _assignPackages(self):
+        pass
     
     def _getPackageDependencies(self):
         """

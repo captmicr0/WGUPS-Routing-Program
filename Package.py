@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timedelta
 
 class Package:
@@ -39,7 +40,7 @@ class Package:
         """
         return f"Package {self.id}:\n" + \
                 f"  {self.address}, {self.city}, {self.state} {self.zip_code}\n" + \
-                f"  {self.weight} KG, Deadline: {self.deadline}" + \
+                f"  {self.weight} KG, Deadline: {self.deadline and self.deadline or "EOD"}" + \
                 (len(self.special_notes) > 0 and f", Notes: {self.special_notes}\n" or "\n") + \
                 f"  Tracking History:\n" + \
                 '\n'.join([f"    {(x[1]) and (datetime.min + x[1]).strftime('%H:%M') or "??:??"}: {x[0]}" for x in self.status])
@@ -62,6 +63,18 @@ class Package:
         notes = self.special_notes
         if "Can only be on truck" in notes:
             return int(notes.split()[-1])
+        return None
+
+    def getArrivalTime(self):
+        notes = self.special_notes
+        # Handle delayed packages
+        if "Delayed on flight---will not arrive to depot until" in notes:
+            time = re.search(r"([0-9]{1,2})\:([0-9]{2})", notes)
+            return timedelta(hours=int(time.group(1)), minutes=int(time.group(2)))
+        # Handle wrong address packages
+        if "Wrong address listed" in notes:
+            # Assume correct addresses are known by 10:20 AM
+            return timedelta(hours=10, minutes=20)
         return None
 
     def updateAddress(self, address, city, state, zip_code):

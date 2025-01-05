@@ -35,7 +35,7 @@ class PackageImporter:
                     row[2], # City
                     row[3], # State
                     int(row[4]), # Zip
-                    'EOD' in row[5] and 'EOD' or (datetime.min + timedelta(days=float(row[5]))).strftime('%H:%M'), # DeliveryDeadline
+                    'EOD' in row[5] and None or (datetime.min + timedelta(days=float(row[5]))).strftime('%H:%M'), # DeliveryDeadline
                     float(row[6]), # WeightKILO
                     row[7]) # SpecialNotes
                 self.packages.append(pkg)
