@@ -11,7 +11,7 @@ from Truck import Truck
 from HashTable import HashTable
 from Package import Package
 
-from pprint import pprint
+from PackageLoader import PackageLoader
 
 # Number of Trucks and Drivers in the delivery system
 NUM_TRUCKS = 3
@@ -29,68 +29,6 @@ pkgHashTable = HashTable(10)
 for pkg in pkgImporter.getPackages():
     pkgHashTable.insert(pkg)
 
-def getAssociatedPackages():
-    """
-    Get list of all packages that must be delivered together
+# Create PackageLoader instance
+pkgLoader = PackageLoader(trucks, pkgHashTable)
 
-    Args:
-        package: The initial package
-    
-    Returns:
-        A list of package list that must be delivered together
-    """
-    masterList = []
-
-    for bucket in pkgHashTable.table:
-        for _, pkg in bucket:
-            if pkg and "Must be delivered with" in pkg.special_notes:
-                # Get list of packages that must be delivered with the current package
-                pkgDependencies = getPackageDependencies(pkg)
-
-                combineList = None
-
-                # Check if any of those packages are already in an list 
-                for dependency in pkgDependencies:
-                    for idx, subList in enumerate(masterList):
-                        if dependency in subList:
-                            combineList = subList
-                            break
-
-                # If any package is already in a list, append all dependencies to that list
-                if combineList:
-                    for dependency in pkgDependencies:
-                        if dependency not in combineList:
-                            combineList.append(dependency)
-                # Otherwise, add all dependencies to a new list
-                else:
-                    masterList.append(pkgDependencies)
-    
-    return masterList
-
-def getPackageDependencies(package):
-    """
-    Parse packages special notes and get a list of directly related packages
-
-    Args:
-        package: The initial package
-    
-    Returns:
-        A list of directly related packages that must be delivered together
-    """
-    notes = package.special_notes
-
-    if "Must be delivered with" in notes:
-        pkgDependencies = [package]
-
-        # Get IDs of other packages that must be delivered with the given package
-        IDs = [int(x) for x in notes.replace(',',' ').split() if x.isdigit()]
-
-        # Append IDs aof additional packages that must be delivered with above packages
-        for pkgID in IDs:
-            pkg = pkgHashTable.lookup(pkgID)
-            pkgDependencies.append(pkg)
-            additionalPkgs = getPackageDependencies(pkg)
-            if additionalPkgs is not None:
-                pkgDependencies.extend(additionalPkgs)
-
-        return pkgDependencies
