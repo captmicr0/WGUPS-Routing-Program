@@ -34,7 +34,7 @@ class Truck:
         return f"Truck #{self.id}, Assigned Driver: {self.driver.id}\n" + \
                 f"  Speed {self.speed}, Capacity: {self.capacity}\n" + \
                 f"  Mileage: {self.mileage}, Current Time: {(datetime.min + self.current_time).strftime("%H:%M")}\n"+ \
-                f"  Location: {self.current_location}\n"
+                f"  Location: {self.current_location}"
     
     def loadPackage(self, pkgHashTable, packageID):
         """

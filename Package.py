@@ -41,7 +41,8 @@ class Package:
                 f"  {self.address}, {self.city}, {self.state} {self.zip_code}\n" + \
                 f"  {self.weight} KG, Deadline: {self.deadline}" + \
                 (len(self.special_notes) > 0 and f", Notes: {self.special_notes}\n" or "\n") + \
-                '\n'.join([f"  {(x[1]) and (datetime.min + x[1]).strftime('%H:%M') or "??:??"}: {x[0]}" for x in self.status]) + "\n"
+                f"  Tracking History:\n" + \
+                '\n'.join([f"    {(x[1]) and (datetime.min + x[1]).strftime('%H:%M') or "??:??"}: {x[0]}" for x in self.status])
     
     def updateStatus(self, status, time=None):
         """
@@ -55,6 +56,13 @@ class Package:
     
     def isOnTruck(self):
         return any(['Loaded on truck' in x[0] for x in self.status])
+
+    
+    def getRequiredTruckID(self):
+        notes = self.special_notes
+        if "Can only be on truck" in notes:
+            return int(notes.split()[-1])
+        return None
 
     def updateAddress(self, address, city, state, zip_code):
         """

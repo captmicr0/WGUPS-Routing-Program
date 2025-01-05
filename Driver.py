@@ -8,7 +8,7 @@ class Driver:
 
         Args:
             id: Unique identifier for the driver.
-            truck: The truck assigned to the driver. Defaults to None.
+            availableTrucks: List of possible trucks the Driver can be assigned to. Defaults to None.
         """
         self.id = id
         self.truck = None
@@ -29,7 +29,7 @@ class Driver:
         Assign a truck to the driver.
 
         Args:
-            truck: The truck to be assigned to the driver.
+            availableTrucks: List of possible trucks the Driver can be assigned to.
 
         Returns:
             True if assignment successful, False otherwise.
