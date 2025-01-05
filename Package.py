@@ -31,6 +31,7 @@ class Package:
         self.weight = weight
         self.status = [[status,status_time]]
         self.special_notes = special_notes
+        self.expected_delivery = None
     
     def __str__(self):
         """
@@ -41,10 +42,10 @@ class Package:
         """
         return f"Package {self.id}:\n" + \
                 f"  {self.address}, {self.city}, {self.state} {self.zip_code}\n" + \
-                f"  {self.weight} KG, Deadline: {self.deadline and (datetime.min + self.deadline).strftime('%H:%M') or "EOD"}" + \
+                f"  {self.weight} KG, Deadline: {self.deadline and (datetime.min + self.deadline).strftime('%H:%M %p') or "EOD"}" + \
                 (len(self.special_notes) > 0 and f", Notes: {self.special_notes}\n" or "\n") + \
                 f"  Tracking History:\n" + \
-                '\n'.join([f"    {(x[1]) and (datetime.min + x[1]).strftime("%H:%M") or "??:??"}: {x[0]}" for x in self.status])
+                '\n'.join([f"    {(x[1]) and (datetime.min + x[1]).strftime("%H:%M %p") or "??:??"}: {x[0]}" for x in self.status])
     
     def __repr__(self):
         """

@@ -13,6 +13,8 @@ from Package import Package
 
 from SortingLoader import SortingLoader
 
+from InfoUI import InfoUI
+
 # Number of Trucks and Drivers in the delivery system
 NUM_TRUCKS = 3
 NUM_DRIVERS = 2
@@ -33,6 +35,10 @@ for pkg in pkgImporter.getPackages():
     pkgHashTable.insert(pkg)
 
 # Create SortingLoader instance
+# This handles package dependencies and other special cases
+# Uses the NN sorting algorithm to load packages onto trucks
 sortingLoader = SortingLoader(addressImporter, pkgHashTable)
 
-print(sortingLoader.pkgDependencies)
+ui = InfoUI(pkgHashTable, trucks)
+
+ui.mainMenuLoop()

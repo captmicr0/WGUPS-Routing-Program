@@ -19,6 +19,7 @@ class Truck:
         self.packageIDs = []
         self.mileage = 0
         self.current_time = start_time
+        self.mileage_log = [[self.mileage, self.current_time]]
         self.speed = speed
         self.capacity = capacity
         self.current_location = "HUB"
@@ -33,8 +34,12 @@ class Truck:
         """
         return f"Truck #{self.id}, Assigned Driver: {self.driver.id}\n" + \
                 f"  Speed {self.speed}, Capacity: {self.capacity}\n" + \
-                f"  Mileage: {self.mileage}, Current Time: {(datetime.min + self.current_time).strftime("%H:%M")}\n"+ \
-                f"  Location: {self.current_location}"
+                f"  Mileage: {self.mileage}, Current Time: {(datetime.min + self.current_time).strftime("%H:%M %p")}\n"+ \
+                f"  Location: {self.current_location}\n" + \
+                f"  Mileage Log:\n" + \
+                '\n'.join([f"    {(x[1]) and (datetime.min + x[1]).strftime("%H:%M %p") or "??:??"}: {x[0]} miles" for x in self.mileage_log]) + "\n" + \
+                f"  Current Load:\n" + \
+                (','.join([f"    {pkgID}" for pkgID in self.packageIDs]) or "    Empty")
     
     def __repr__(self):
         """
@@ -91,9 +96,11 @@ class Truck:
         travel_time = distance / self.speed
         self.current_time += timedelta(hours=travel_time)
         self.mileage += distance
+        self.mileage_log.append([self.mileage, self.current_time])
         package.updateStatus("Delivered", self.current_time)
         self.packageIDs.remove(packageID)
         self.current_location = package.address
+
 
     def returnToHub(self, distance_to_hub):
         """
@@ -105,6 +112,7 @@ class Truck:
         travel_time = distance_to_hub / self.speed
         self.current_time += timedelta(hours=travel_time)
         self.mileage += distance_to_hub
+        self.mileage_log.append([self.mileage, self.current_time])
         self.current_location = "HUB"
 
     def getPackages(self, pkgHashTable):
