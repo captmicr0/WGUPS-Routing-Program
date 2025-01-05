@@ -108,13 +108,8 @@ class SortingLoader:
             A list of package list that can be loaded onto the truck
         """
         unloadablePkgs = self._getUnloadablePackages()
-        loadablePkgs = []
-
-        for pkg in self._getUnloadedPackages():
-            if pkg not in unloadablePkgs:
-                loadablePkgs.append(pkg)
         
-        return loadablePkgs
+        return [pkg for pkg in self._getUnloadedPackages() if pkg not in unloadablePkgs]
 
     def _getUnloadedPackages(self):
         """
