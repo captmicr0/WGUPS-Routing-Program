@@ -273,7 +273,7 @@ class InfoUI:
         timeStr = input("Enter time (HH:MM AM/PM), or press ENTER for all data: ")
         if len(timeStr) == 0:
             return None
-        time = datetime.strptime("12:30 AM", "%I:%M %p")
+        time = datetime.strptime(timeStr, "%I:%M %p")
         return timedelta(hours=time.hour, minutes=time.minute)
     
     def _waitToContinue(self):
