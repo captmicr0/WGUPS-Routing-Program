@@ -54,6 +54,7 @@ for truck in trucks:
     router.loadPackagesOntoTruck(truck)
 
 # Deliver packages
+# This will load more packages onto the trucks as needed
 router.deliverPackages(trucks)
 
 # Creates InfoUI instance and starts the UI menu loop

@@ -296,5 +296,5 @@ class InfoUI:
         
         Note: This method may not work on all operating systems or terminals.
         """
-        print("\033[H\033[J", end="")
         print("\033[H\033[3J", end="")
+        print("\033[H\033[J", end="")
