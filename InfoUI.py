@@ -215,8 +215,8 @@ class InfoUI:
                     truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
             
             print("------------------------------------------------------")
-            print(f"--- Packages on Truck #{truckID} -- {self.trucks[truckID-1].mileage:4.1f} miles --------------")
-            for pkgID in truckPkgIDs[truckID]:
+            print(f"--- Packages on Truck #{truckID+1} -- {self.trucks[truckID].mileage:4.1f} miles --------------")
+            for pkgID in truckPkgIDs[truckID+1]:
                 print(pkgReport[pkgID])
             print("------------------------------------------------------")
         else:
@@ -230,8 +230,8 @@ class InfoUI:
                     truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
             
             print("------------------------------------------------------")
-            print(f"--- Packages on Truck #{truckID} -- {self.trucks[truckID-1].mileage:4.1f} miles --------------")
-            for pkgID in truckPkgIDs[truckID]:
+            print(f"--- Packages on Truck #{truckID+1} -- {self.trucks[truckID].mileage:4.1f} miles --------------")
+            for pkgID in truckPkgIDs[truckID+1]:
                 print(pkgReport[pkgID])
             print("------------------------------------------------------")
         
