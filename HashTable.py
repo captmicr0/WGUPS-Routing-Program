@@ -67,3 +67,34 @@ class HashTable:
             if item[0] == pkgID:
                 return item[1]
         return None
+    
+    def __iter__(self):
+        """
+        Initialize the iterator.
+
+        Returns:
+            The HashTable object itself.
+        """
+        self._iterator_bucket = 0
+        self._iterator_item = 0
+        return self
+
+    def __next__(self):
+        """
+        Get the next item in the hash table.
+
+        Returns:
+            The next package in the hash table.
+
+        Raises:
+            StopIteration: When all items have been iterated over.
+        """
+        while self._iterator_bucket < self.size:
+            if self._iterator_item < len(self.table[self._iterator_bucket]):
+                item = self.table[self._iterator_bucket][self._iterator_item]
+                self._iterator_item += 1
+                return item[1]  # Return the package object
+            self._iterator_bucket += 1
+            self._iterator_item = 0
+        raise StopIteration
+
