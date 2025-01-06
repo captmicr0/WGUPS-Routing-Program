@@ -1,4 +1,3 @@
-import re
 from datetime import datetime, timedelta
 
 class InfoUI:
@@ -22,9 +21,9 @@ class InfoUI:
         """
         self._clear()
         print("""
-------------------------------------------------------
---- WGUPS Package Tracking and Delivery Status -------
-------------------------------------------------------
+--------------------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---------------------
+--------------------------------------------------------------------
 
 1. Generate Report
 2. View Package Status
@@ -56,11 +55,11 @@ class InfoUI:
         """
         self._clear()
         print("""
-------------------------------------------------------
---- WGUPS Package Tracking and Delivery Status -------
-------------------------------------------------------
------- Report Generator ------------------------------
-------------------------------------------------------
+--------------------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---------------------
+--------------------------------------------------------------------
+------ Report Generator --------------------------------------------
+--------------------------------------------------------------------
 """)
         atTime = self._inputTime()
         if atTime:
@@ -77,11 +76,11 @@ class InfoUI:
         """
         self._clear()
         print(f"""
-------------------------------------------------------
---- WGUPS Package Tracking and Delivery Status -------
-------------------------------------------------------
------- Timed Report as of {(datetime.min + atTime).strftime("%I:%M %p")} -------------------
-------------------------------------------------------
+--------------------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---------------------
+--------------------------------------------------------------------
+------ Timed Report as of {(datetime.min + atTime).strftime("%I:%M %p")} ---------------------------------
+--------------------------------------------------------------------
 """)
         totalMiles = 0
         for truck in self.trucks:
@@ -102,8 +101,8 @@ class InfoUI:
         
         # Per-Truck reporting
         for truckID in range(1, len(self.trucks) + 1):
-            print("------------------------------------------------------")
-            print(f"--- Packages on Truck #{truckID} -- {sum([x[0] for x in self.trucks[truckID-1].mileage_log if x[1] <= atTime]):4.1f} miles --------------")
+            print("--------------------------------------------------------------------")
+            print(f"--- Packages on Truck #{truckID} - {sum([x[0] for x in self.trucks[truckID-1].mileage_log if x[1] <= atTime]):4.1f} miles - As of {(datetime.min + atTime).strftime("%I:%M %p")} ------------")
 
             for pkgID in truckPkgIDs[truckID]:
                 print(pkgReport[pkgID])
@@ -113,7 +112,7 @@ class InfoUI:
         #    if line:
         #        print(line)
 
-        print("------------------------------------------------------")
+        print("--------------------------------------------------------------------")
         self._waitToContinue()
 
     def _generateFullReport(self):
@@ -122,11 +121,11 @@ class InfoUI:
         """
         self._clear()
         print(f"""
-------------------------------------------------------
---- WGUPS Package Tracking and Delivery Status -------
-------------------------------------------------------
------- Full Report -----------------------------------
-------------------------------------------------------
+--------------------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---------------------
+--------------------------------------------------------------------
+------ Full Report -------------------------------------------------
+--------------------------------------------------------------------
 """)
         totalMiles = sum([truck.mileage for truck in self.trucks])
         print(f"Total Mileage Traveled by All Trucks: {totalMiles:4.1f} miles")
@@ -143,8 +142,8 @@ class InfoUI:
         
         # Per-Truck reporting
         for truckID in range(1, len(self.trucks) + 1):
-            print("------------------------------------------------------")
-            print(f"--- Packages on Truck #{truckID} -- {self.trucks[truckID-1].mileage:4.1f} miles --------------")
+            print("--------------------------------------------------------------------")
+            print(f"--- Packages on Truck #{truckID} -- {self.trucks[truckID-1].mileage:4.1f} miles ----------------------------")
             
             for pkgID in truckPkgIDs[truckID]:
                 print(pkgReport[pkgID])
@@ -154,7 +153,7 @@ class InfoUI:
         #    if line:
         #        print(line)
         
-        print("------------------------------------------------------")
+        print("--------------------------------------------------------------------")
         self._waitToContinue()
 
     def packageStatus(self):
@@ -163,11 +162,11 @@ class InfoUI:
         """
         self._clear()
         print("""
-------------------------------------------------------
---- WGUPS Package Tracking and Delivery Status -------
-------------------------------------------------------
------- Package Status --------------------------------
-------------------------------------------------------
+--------------------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---------------------
+--------------------------------------------------------------------
+------ Package Status ----------------------------------------------
+--------------------------------------------------------------------
 """)
         pkgCount = len([pkg for bucket in self.pkgHashTable.table for _, pkg in bucket])
         pkgID = int(input(f"Enter Package ID (1-{pkgCount}): "))
@@ -188,11 +187,11 @@ class InfoUI:
         """
         self._clear()
         print("""
-------------------------------------------------------
---- WGUPS Package Tracking and Delivery Status -------
-------------------------------------------------------
------- Truck Status ----------------------------------
-------------------------------------------------------
+--------------------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---------------------
+--------------------------------------------------------------------
+------ Truck Status ------------------------------------------------
+--------------------------------------------------------------------
 """)
         truckID = int(input(f"Enter Truck ID (1-{len(self.trucks)}): ")) - 1
 
@@ -214,11 +213,11 @@ class InfoUI:
                         (alreadyDelivered and f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}" or "Not Delivered")
                     truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
             
-            print("------------------------------------------------------")
-            print(f"--- Packages on Truck #{truckID} -- {sum([x[0] for x in self.trucks[truckID-1].mileage_log if x[1] <= atTime]):4.1f} miles --------------")
+            print("--------------------------------------------------------------------")
+            print(f"--- Packages on Truck #{truckID} - {sum([x[0] for x in self.trucks[truckID-1].mileage_log if x[1] <= atTime]):4.1f} miles - As of {(datetime.min + atTime).strftime("%I:%M %p")} ------------")
             for pkgID in truckPkgIDs[truckID+1]:
                 print(pkgReport[pkgID])
-            print("------------------------------------------------------")
+            print("--------------------------------------------------------------------")
         else:
             print(self.trucks[truckID])
             print()
@@ -231,11 +230,11 @@ class InfoUI:
                         f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}"
                     truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
             
-            print("------------------------------------------------------")
-            print(f"--- Packages on Truck #{truckID+1} -- {self.trucks[truckID].mileage:4.1f} miles --------------")
+            print("--------------------------------------------------------------------")
+            print(f"--- Packages on Truck #{truckID+1} -- {self.trucks[truckID].mileage:4.1f} miles ----------------------------")
             for pkgID in truckPkgIDs[truckID+1]:
                 print(pkgReport[pkgID])
-            print("------------------------------------------------------")
+            print("--------------------------------------------------------------------")
         
         self._waitToContinue()
         
@@ -244,11 +243,11 @@ class InfoUI:
         Display the total mileage traveled by all trucks.
         """
         print("""
-------------------------------------------------------
---- WGUPS Package Tracking and Delivery Status -------
-------------------------------------------------------
------- Truck Mileage ---------------------------------
-------------------------------------------------------
+--------------------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---------------------
+--------------------------------------------------------------------
+------ Truck Mileage -----------------------------------------------
+--------------------------------------------------------------------
 """)
         self._clear()
         atTime = self._inputTime()
@@ -273,10 +272,9 @@ class InfoUI:
         """
         timeStr = input("Enter time (HH:MM AM/PM), or press ENTER for all data: ")
         if len(timeStr) == 0:
-            return None 
-        time = re.search(r"([0-9]{1,2})\:([0-9]{2})", timeStr)
-        return timedelta(hours=('PM' in timeStr and 12 or 0) + int(time.group(1)),
-                         minutes=int(time.group(2)))
+            return None
+        time = datetime.strptime("12:30 AM", "%I:%M %p")
+        return timedelta(hours=time.hour, minutes=time.minute)
     
     def _waitToContinue(self):
         """
