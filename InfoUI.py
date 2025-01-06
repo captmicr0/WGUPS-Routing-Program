@@ -8,50 +8,117 @@ class InfoUI:
     
     def mainMenuLoop(self):
         self._clear()
-        print(\
-"""WGUPS Package Tracking and Delivery Status
-------------------------------------------
+        print("""
+--------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---
+--------------------------------------------------
 
-1. View Package Status
-2. View Truck Status
-3. View Total Mileage
-4. Exit
+1. Generate Report
+2. View Package Status
+3. View Truck Status
+4. View Total Mileage
+5. Exit
 """)
-        choice = int(input("Enter your choice (1-4): "))
+        choice = int(input("Enter your choice (1-5): "))
 
         if choice == 1:
-            self.packageStatus()
+            self.generateReport()
         elif choice == 2:
-            self.truckStatus()
+            self.packageStatus()
         elif choice == 3:
-            self.totalMileage()
+            self.truckStatus()
         elif choice == 4:
+            self.totalMileage()
+        elif choice == 5:
             print("Thank you for using WGUPS Package Tracking. Goodbye!")
             return
         
         self.mainMenuLoop()
+    
+    def generateReport(self):
+        self._clear()
+        print("""
+--------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---
+--------------------------------------------------
+------ Report Generator --------------------------
+--------------------------------------------------
+""")
+        atTime = self._inputTime()
+        if atTime:
+            self._generateTimedReport(atTime)
+        else:
+            self._generateFullReport()
+        self._waitToContinue()
+
+    def _generateTimedReport(self, atTime):
+        pass
+
+    def _generateFullReport(self):
+        pass
 
     def packageStatus(self):
         self._clear()
+        print("""
+--------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---
+--------------------------------------------------
+------ Package Status ----------------------------
+--------------------------------------------------
+""")
         pkgCount = len([pkg for bucket in self.pkgHashTable.table for _, pkg in bucket])
         pkgID = int(input(f"Enter Package ID (1-{pkgCount}): "))
-        print(self.pkgHashTable.lookup(pkgID))
+        atTime = self._inputTime()
+        print()
+        if atTime:
+            print(self.pkgHashTable.lookup(pkgID).__str__(atTime))
+        else:
+            print(self.pkgHashTable.lookup(pkgID))
         self._waitToContinue()
 
     def truckStatus(self):
         self._clear()
+        print("""
+--------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---
+--------------------------------------------------
+------ Truck Status ------------------------------
+--------------------------------------------------
+""")
         truckID = int(input(f"Enter Truck ID (1-{len(self.trucks)}): ")) - 1
-        print(self.trucks[truckID])
+        atTime = self._inputTime()
+        print()
+        if atTime:
+            print(self.trucks[truckID].__str__(atTime))
+        else:
+            print(self.trucks[truckID])
         self._waitToContinue()
         
     def totalMileage(self):
+        print("""
+--------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---
+--------------------------------------------------
+------ Truck Mileage -----------------------------
+--------------------------------------------------
+""")
         self._clear()
-        totalMiles = sum([truck.mileage for truck in self.trucks])
-        print(f"Total Mileage Traveled by All Trucks: {totalMiles}")
+        atTime = self._inputTime()
+        print()
+        if atTime:
+            totalMiles = 0
+            for truck in self.trucks:
+                totalMiles += [x[0] for x in truck.status if x[1] <= atTime][-1]
+            print(f"Total Mileage Traveled by All Trucks at {(datetime.min + atTime).strftime("%I:%M %p")}: {totalMiles}")
+        else:
+            totalMiles = sum([truck.mileage for truck in self.trucks])
+            print(f"Total Mileage Traveled by All Trucks: {totalMiles}")
         self._waitToContinue()
     
     def _inputTime(self):
-        timeStr = input("Enter time (HH:MM AM/PM): ")
+        timeStr = input("Enter time (HH:MM AM/PM), or press ENTER for all data: ")
+        if len(timeStr) == 0:
+            return None 
         time = re.search(r"([0-9]{1,2})\:([0-9]{2})", timeStr)
         return timedelta(hours=('PM' in timeStr and 12 or 0) + int(time.group(1)),
                          minutes=int(time.group(2)))
