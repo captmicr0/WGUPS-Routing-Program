@@ -78,14 +78,16 @@ class Package:
         Check if the package is currently loaded on a truck.
 
         Returns:
-            True if the package is on a truck, False otherwise.
+            Which truck the package is on, False is not loaded (or already delivered, accordin to atTime).
         """
         if atTime:
             alreadyLoaded = any(["Loaded on truck" in x[0] for x in self.status if x[1] < atTime])
+            whichTruck = [x[0].split('#')[-1] for x in self.status if (x[1] < atTime) and ("Loaded on truck" in x[0])]
             alreadyDelivered = any(["Delivered" in x[0] for x in self.status if x[1] < atTime])
-            return alreadyLoaded and not alreadyDelivered
+            return (alreadyLoaded and not alreadyDelivered) and int(whichTruck[0]) or False
         
-        return any(["Loaded on truck" in x[0] for x in self.status])
+        whichTruck = [x[0].split('#')[-1] for x in self.status if "Loaded on truck" in x[0]]
+        return any(["Loaded on truck" in x[0] for x in self.status]) and int(whichTruck[0]) or False
 
     def isDelivered(self):
         """

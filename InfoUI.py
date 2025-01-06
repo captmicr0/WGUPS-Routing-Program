@@ -11,9 +11,9 @@ class InfoUI:
     def mainMenuLoop(self):
         self._clear()
         print("""
---------------------------------------------------
---- WGUPS Package Tracking and Delivery Status ---
---------------------------------------------------
+------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status -------
+------------------------------------------------------
 
 1. Generate Report
 2. View Package Status
@@ -40,11 +40,11 @@ class InfoUI:
     def generateReport(self):
         self._clear()
         print("""
---------------------------------------------------
---- WGUPS Package Tracking and Delivery Status ---
---------------------------------------------------
------- Report Generator --------------------------
---------------------------------------------------
+------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status -------
+------------------------------------------------------
+------ Report Generator ------------------------------
+------------------------------------------------------
 """)
         atTime = self._inputTime()
         if atTime:
@@ -55,11 +55,11 @@ class InfoUI:
     def _generateTimedReport(self, atTime):
         self._clear()
         print(f"""
---------------------------------------------------
---- WGUPS Package Tracking and Delivery Status ---
---------------------------------------------------
------- Timed Report as of {(datetime.min + atTime).strftime("%I:%M %p")} ---------------
---------------------------------------------------
+------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status -------
+------------------------------------------------------
+------ Timed Report as of {(datetime.min + atTime).strftime("%I:%M %p")} -------------------
+------------------------------------------------------
 """)
         totalMiles = 0
         for truck in self.trucks:
@@ -68,6 +68,7 @@ class InfoUI:
         print()
 
         pkgReport = [None] * (max([pkg.id for bucket in self.pkgHashTable.table for _, pkg in bucket]) + 1)
+        truckPkgIDs = [[] for _ in range(len(self.trucks) + 1)]
         for bucket in self.pkgHashTable.table:
             for _, pkg in bucket:
                 alreadyLoaded = any(["Loaded on truck" in x[0] for x in pkg.status if x[1] <= atTime])
@@ -75,47 +76,69 @@ class InfoUI:
                 pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
                       (alreadyLoaded and f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " or "Not Loaded        , ") + \
                       (alreadyDelivered and f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}" or "Not Delivered")
+                truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
         
-        for line in pkgReport:
-            if line:
-                print(line)
+        # Per-Truck reporting
+        for truckID in range(1, len(self.trucks) + 1):
+            print("------------------------------------------------------")
+            print(f"--- Packages on Truck #{truckID} -- {self.trucks[truckID-1].mileage:4.1f} miles --------------")
+            for pkgID in truckPkgIDs[truckID]:
+                print(pkgReport[pkgID])
+        
+        # Global reporting
+        #for line in pkgReport:
+        #    if line:
+        #        print(line)
 
+        print("------------------------------------------------------")
         self._waitToContinue()
 
     def _generateFullReport(self):
         self._clear()
         print(f"""
---------------------------------------------------
---- WGUPS Package Tracking and Delivery Status ---
---------------------------------------------------
------- Full Report -------------------------------
---------------------------------------------------
+------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status -------
+------------------------------------------------------
+------ Full Report -----------------------------------
+------------------------------------------------------
 """)
         totalMiles = sum([truck.mileage for truck in self.trucks])
-        print(f"Total Mileage Traveled by All Trucks: {totalMiles:.1f}")
+        print(f"Total Mileage Traveled by All Trucks: {totalMiles:.1f} miles")
         print()
 
         pkgReport = [None] * (max([pkg.id for bucket in self.pkgHashTable.table for _, pkg in bucket]) + 1)
+        truckPkgIDs = [[] for _ in range(len(self.trucks) + 1)]
         for bucket in self.pkgHashTable.table:
             for _, pkg in bucket:
                 pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
                       f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " + \
                       f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}"
+                truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
         
-        for line in pkgReport:
-            if line:
-                print(line)
+        # Per-Truck reporting
+        for truckID in range(1, len(self.trucks) + 1):
+            print("------------------------------------------------------")
+            print(f"--- Packages on Truck #{truckID} -- {self.trucks[truckID-1].mileage:4.1f} miles --------------")
+            
+            for pkgID in truckPkgIDs[truckID]:
+                print(pkgReport[pkgID])
         
+        # Global reporting
+        #for line in pkgReport:
+        #    if line:
+        #        print(line)
+        
+        print("------------------------------------------------------")
         self._waitToContinue()
 
     def packageStatus(self):
         self._clear()
         print("""
---------------------------------------------------
---- WGUPS Package Tracking and Delivery Status ---
---------------------------------------------------
------- Package Status ----------------------------
---------------------------------------------------
+------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status -------
+------------------------------------------------------
+------ Package Status --------------------------------
+------------------------------------------------------
 """)
         pkgCount = len([pkg for bucket in self.pkgHashTable.table for _, pkg in bucket])
         pkgID = int(input(f"Enter Package ID (1-{pkgCount}): "))
@@ -133,11 +156,11 @@ class InfoUI:
     def truckStatus(self):
         self._clear()
         print("""
---------------------------------------------------
---- WGUPS Package Tracking and Delivery Status ---
---------------------------------------------------
------- Truck Status ------------------------------
---------------------------------------------------
+------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status -------
+------------------------------------------------------
+------ Truck Status ----------------------------------
+------------------------------------------------------
 """)
         truckID = int(input(f"Enter Truck ID (1-{len(self.trucks)}): ")) - 1
 
@@ -153,11 +176,11 @@ class InfoUI:
         
     def totalMileage(self):
         print("""
---------------------------------------------------
---- WGUPS Package Tracking and Delivery Status ---
---------------------------------------------------
------- Truck Mileage -----------------------------
---------------------------------------------------
+------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status -------
+------------------------------------------------------
+------ Truck Mileage ---------------------------------
+------------------------------------------------------
 """)
         self._clear()
         atTime = self._inputTime()
@@ -167,10 +190,10 @@ class InfoUI:
             totalMiles = 0
             for truck in self.trucks:
                 totalMiles += [x[0] for x in truck.mileage_log if x[1] <= atTime][-1]
-            print(f"Total Mileage Traveled by All Trucks at {(datetime.min + atTime).strftime("%I:%M %p")}: {totalMiles:.1f}")
+            print(f"Total Mileage Traveled by All Trucks at {(datetime.min + atTime).strftime("%I:%M %p")}: {totalMiles:.1f} miles")
         else:
             totalMiles = sum([truck.mileage for truck in self.trucks])
-            print(f"Total Mileage Traveled by All Trucks: {totalMiles:.1f}")
+            print(f"Total Mileage Traveled by All Trucks: {totalMiles:.1f} miles")
         self._waitToContinue()
     
     def _inputTime(self):
