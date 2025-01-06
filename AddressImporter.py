@@ -83,6 +83,15 @@ class AddressImporter:
         return self.distances[addr1_index][addr2_index]
     
     def _normalize_address(self, addr):
+        """
+        Normalize the given address by converting it to lowercase and abbreviating cardinal directions.
+
+        Args:
+            addr : The address to normalize.
+
+        Returns:
+            The normalized address.
+        """
         return addr.lower().replace('south','s').replace('west','w').replace('north','n').replace('east','e')
 
 # Test the AddressImporter class

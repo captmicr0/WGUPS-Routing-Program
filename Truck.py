@@ -40,9 +40,9 @@ class Truck:
                 f"  Mileage: {self.mileage}, Current Time: {(datetime.min + self.current_time).strftime("%I:%M %p")}\n"+ \
                 f"  Location: {self.current_location}\n" + \
                 f"  Mileage Log{(until != timedelta(hours=24, minutes=00)) and f" until {(datetime.min + until).strftime("%I:%M %p")}" or ""}:\n" + \
-                '\n'.join([f"    {(x[1]) and (datetime.min + x[1]).strftime("%I:%M %p") or "??:??"}: {x[0]:.1f} miles" for x in self.mileage_log if x[1] < until]) + "\n" + \
-                f"  Current Load:\n" + \
-                (','.join([f"    {pkgID}" for pkgID in self.packageIDs]) or "    Empty")
+                '\n'.join([f"    {(x[1]) and (datetime.min + x[1]).strftime("%I:%M %p") or "??:??"}: {x[0]:.1f} miles" for x in self.mileage_log if x[1] < until]) #+ "\n" + \
+                #f"  Current Load:\n" + \
+                #(','.join([f"    {pkgID}" for pkgID in self.packageIDs]) or "    Empty")
     
     def __repr__(self):
         """

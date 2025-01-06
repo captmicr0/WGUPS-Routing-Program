@@ -17,6 +17,12 @@ class Routing:
         self.pkgDependencies = self._getPackageDependencies()
     
     def deliverPackages(self, trucks):
+        """
+        Deliver all packages using the available trucks.
+
+        Args:
+            trucks: List of Truck objects available for deliveries.
+        """
         # Loop until all packages are delivered
         while not self._allPackagesDelivered():
             # Deliver packages for each truck
@@ -51,6 +57,12 @@ class Routing:
                 self.loadPackagesOntoTruck(truck)
     
     def _allPackagesDelivered(self):
+        """
+        Check if all packages in the hash table have been delivered.
+
+        Returns:
+            True if all packages are delivered, False otherwise.
+        """
         return all([pkg.isDelivered() for bucket in self.pkgHashTable.table for _, pkg in bucket])
     
     def loadPackagesOntoTruck(self, truck):
