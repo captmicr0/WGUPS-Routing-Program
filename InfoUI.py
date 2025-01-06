@@ -242,6 +242,7 @@ class InfoUI:
         """
         Display the total mileage traveled by all trucks.
         """
+        self._clear()
         print("""
 --------------------------------------------------------------------
 --- WGUPS Package Tracking and Delivery Status ---------------------
@@ -249,7 +250,6 @@ class InfoUI:
 ------ Truck Mileage -----------------------------------------------
 --------------------------------------------------------------------
 """)
-        self._clear()
         atTime = self._inputTime()
         print()
 
@@ -292,7 +292,9 @@ class InfoUI:
         This method uses ANSI escape codes to clear the console screen:
         - \033[H moves the cursor to the top-left corner of the screen
         - \033[J clears the screen from the cursor position to the end
+        - \033[3J clears the entire screen and scrollback buffer
         
         Note: This method may not work on all operating systems or terminals.
         """
         print("\033[H\033[J", end="")
+        print("\033[H\033[3J", end="")
