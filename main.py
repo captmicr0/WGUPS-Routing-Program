@@ -43,11 +43,10 @@ drivers = [Driver(id, trucks) for id in range(1, NUM_MIN + 1)]
 # Get the earliest delayed arrival time
 delayedArrivalTime = timedelta(hours=24, minutes=0)
 
-for bucket in pkgHashTable.table:
-    for _, pkg in bucket:
-        pkgArrivalTime = pkg.getArrivalTime()
-        if pkgArrivalTime and (delayedArrivalTime > pkgArrivalTime):
-            delayedArrivalTime = pkgArrivalTime
+for pkg in pkgHashTable:
+    pkgArrivalTime = pkg.getArrivalTime()
+    if pkgArrivalTime and (delayedArrivalTime > pkgArrivalTime):
+        delayedArrivalTime = pkgArrivalTime
 
 # Load packages onto trucks, initial start-of-day load
 for truck in trucks:

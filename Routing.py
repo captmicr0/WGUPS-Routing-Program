@@ -63,7 +63,7 @@ class Routing:
         Returns:
             True if all packages are delivered, False otherwise.
         """
-        return all([pkg.isDelivered() for bucket in self.pkgHashTable.table for _, pkg in bucket])
+        return all([pkg.isDelivered() for pkg in self.pkgHashTable])
     
     def loadPackagesOntoTruck(self, truck):
         """
@@ -166,7 +166,7 @@ class Routing:
         Returns:
             A list of packages that are NOT loaded onto a truck
         """
-        return [pkg for bucket in self.pkgHashTable.table for _, pkg in bucket if not pkg.isOnTruck()]
+        return [pkg for pkg in self.pkgHashTable if not pkg.isOnTruck()]
 
     def _getUnloadablePackages(self, truck):
         """
@@ -180,29 +180,28 @@ class Routing:
         """
         unloadablePkgs = []
         
-        for bucket in self.pkgHashTable.table:
-            for _, pkg in bucket:
-                # If the package is already loaded onto a truck, add it to the list
-                if pkg.isOnTruck():
+        for pkg in self.pkgHashTable:
+            # If the package is already loaded onto a truck, add it to the list
+            if pkg.isOnTruck():
+                unloadablePkgs.append(pkg)
+            
+            # Handle delayed packages
+            elif (pkg.getRequiredTruckID() is not None) and (pkg.getRequiredTruckID() != truck.id):
+                if pkg not in unloadablePkgs:
                     unloadablePkgs.append(pkg)
-                
-                # Handle delayed packages
-                elif (pkg.getRequiredTruckID() is not None) and (pkg.getRequiredTruckID() != truck.id):
-                    if pkg not in unloadablePkgs:
-                        unloadablePkgs.append(pkg)
-                
-                # Handle packages that need to be on a specific truck
-                elif (pkg.getArrivalTime() is not None) and (pkg.getArrivalTime() >= truck.current_time):
-                    unloadablePkgs.append(pkg)
+            
+            # Handle packages that need to be on a specific truck
+            elif (pkg.getArrivalTime() is not None) and (pkg.getArrivalTime() >= truck.current_time):
+                unloadablePkgs.append(pkg)
 
-                    # Make sure any dependent packages are unloadable aswell
-                    for subList in self.pkgDependencies:
-                        # Does the package have an dependencies?
-                        if pkg in subList:
-                            # Add all of them to the unloadable list if they aren't already
-                            for dependentPkg in subList:
-                                if dependentPkg not in unloadablePkgs:
-                                    unloadablePkgs.append(dependentPkg)
+                # Make sure any dependent packages are unloadable aswell
+                for subList in self.pkgDependencies:
+                    # Does the package have an dependencies?
+                    if pkg in subList:
+                        # Add all of them to the unloadable list if they aren't already
+                        for dependentPkg in subList:
+                            if dependentPkg not in unloadablePkgs:
+                                unloadablePkgs.append(dependentPkg)
         
         return unloadablePkgs
     
@@ -214,11 +213,10 @@ class Routing:
             A list of package lists that must be delivered together.
         """
         masterList = []
-        for bucket in self.pkgHashTable.table:
-            for _, pkg in bucket:
-                if pkg and "Must be delivered with" in pkg.special_notes:
-                    pkgDependencies = self._getPackageSubDependencies(pkg)
-                    self._updateMasterList(masterList, pkgDependencies)
+        for pkg in self.pkgHashTable:
+            if pkg and "Must be delivered with" in pkg.special_notes:
+                pkgDependencies = self._getPackageSubDependencies(pkg)
+                self._updateMasterList(masterList, pkgDependencies)
         return masterList
 
     def _getPackageSubDependencies(self, package):

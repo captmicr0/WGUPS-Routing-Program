@@ -88,16 +88,15 @@ class InfoUI:
         print(f"Total Mileage Traveled by All Trucks at {(datetime.min + atTime).strftime("%I:%M %p")}: {totalMiles:4.1f}")
         print()
 
-        pkgReport = [None] * (max([pkg.id for bucket in self.pkgHashTable.table for _, pkg in bucket]) + 1)
+        pkgReport = [None] * (max([pkg.id for pkg in self.pkgHashTable]) + 1)
         truckPkgIDs = [[] for _ in range(len(self.trucks) + 1)]
-        for bucket in self.pkgHashTable.table:
-            for _, pkg in bucket:
-                alreadyLoaded = any(["Loaded on truck" in x[0] for x in pkg.status if x[1] <= atTime])
-                alreadyDelivered = any(["Delivered" in x[0] for x in pkg.status if x[1] <= atTime])
-                pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
-                      (alreadyLoaded and f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " or "Not Loaded        , ") + \
-                      (alreadyDelivered and f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}" or "Not Delivered")
-                truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
+        for pkg in self.pkgHashTable:
+            alreadyLoaded = any(["Loaded on truck" in x[0] for x in pkg.status if x[1] <= atTime])
+            alreadyDelivered = any(["Delivered" in x[0] for x in pkg.status if x[1] <= atTime])
+            pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
+                    (alreadyLoaded and f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " or "Not Loaded        , ") + \
+                    (alreadyDelivered and f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}" or "Not Delivered")
+            truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
         
         # Per-Truck reporting
         for truckID in range(1, len(self.trucks) + 1):
@@ -131,14 +130,13 @@ class InfoUI:
         print(f"Total Mileage Traveled by All Trucks: {totalMiles:4.1f} miles")
         print()
 
-        pkgReport = [None] * (max([pkg.id for bucket in self.pkgHashTable.table for _, pkg in bucket]) + 1)
+        pkgReport = [None] * (max([pkg.id for pkg in self.pkgHashTable]) + 1)
         truckPkgIDs = [[] for _ in range(len(self.trucks) + 1)]
-        for bucket in self.pkgHashTable.table:
-            for _, pkg in bucket:
-                pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
-                      f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " + \
-                      f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}"
-                truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
+        for pkg in self.pkgHashTable:
+            pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
+                    f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " + \
+                    f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}"
+            truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
         
         # Per-Truck reporting
         for truckID in range(1, len(self.trucks) + 1):
@@ -168,7 +166,7 @@ class InfoUI:
 ------ Package Status ----------------------------------------------
 --------------------------------------------------------------------
 """)
-        pkgCount = len([pkg for bucket in self.pkgHashTable.table for _, pkg in bucket])
+        pkgCount = len([pkg for pkg in self.pkgHashTable])
         pkgID = int(input(f"Enter Package ID (1-{pkgCount}): "))
 
         atTime = self._inputTime()
@@ -202,16 +200,15 @@ class InfoUI:
         if atTime:
             print(self.trucks[truckID].__str__(atTime))
             print()
-            pkgReport = [None] * (max([pkg.id for bucket in self.pkgHashTable.table for _, pkg in bucket]) + 1)
+            pkgReport = [None] * (max([pkg.id for pkg in self.pkgHashTable]) + 1)
             truckPkgIDs = [[] for _ in range(len(self.trucks) + 1)]
-            for bucket in self.pkgHashTable.table:
-                for _, pkg in bucket:
-                    alreadyLoaded = any(["Loaded on truck" in x[0] for x in pkg.status if x[1] <= atTime])
-                    alreadyDelivered = any(["Delivered" in x[0] for x in pkg.status if x[1] <= atTime])
-                    pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
-                        (alreadyLoaded and f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " or "Not Loaded        , ") + \
-                        (alreadyDelivered and f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}" or "Not Delivered")
-                    truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
+            for pkg in self.pkgHashTable:
+                alreadyLoaded = any(["Loaded on truck" in x[0] for x in pkg.status if x[1] <= atTime])
+                alreadyDelivered = any(["Delivered" in x[0] for x in pkg.status if x[1] <= atTime])
+                pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
+                    (alreadyLoaded and f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " or "Not Loaded        , ") + \
+                    (alreadyDelivered and f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}" or "Not Delivered")
+                truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
             
             print("--------------------------------------------------------------------")
             print(f"--- Packages on Truck #{truckID} - {sum([x[0] for x in self.trucks[truckID-1].mileage_log if x[1] <= atTime]):4.1f} miles - As of {(datetime.min + atTime).strftime("%I:%M %p")} ------------")
@@ -221,14 +218,13 @@ class InfoUI:
         else:
             print(self.trucks[truckID])
             print()
-            pkgReport = [None] * (max([pkg.id for bucket in self.pkgHashTable.table for _, pkg in bucket]) + 1)
+            pkgReport = [None] * (max([pkg.id for pkg in self.pkgHashTable]) + 1)
             truckPkgIDs = [[] for _ in range(len(self.trucks) + 1)]
-            for bucket in self.pkgHashTable.table:
-                for _, pkg in bucket:
-                    pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
-                        f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " + \
-                        f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}"
-                    truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
+            for pkg in self.pkgHashTable:
+                pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
+                    f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " + \
+                    f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}"
+                truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
             
             print("--------------------------------------------------------------------")
             print(f"--- Packages on Truck #{truckID+1} -- {self.trucks[truckID].mileage:4.1f} miles ----------------------------")
