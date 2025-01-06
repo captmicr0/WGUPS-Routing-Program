@@ -73,13 +73,18 @@ class Package:
         if [status, time] not in self.status:
             self.status.append([status, time])
     
-    def isOnTruck(self):
+    def isOnTruck(self, atTime=None):
         """
         Check if the package is currently loaded on a truck.
 
         Returns:
             True if the package is on a truck, False otherwise.
         """
+        if atTime:
+            alreadyLoaded = any(["Loaded on truck" in x[0] for x in self.status if x[1] < atTime])
+            alreadyDelivered = any(["Delivered" in x[0] for x in self.status if x[1] < atTime])
+            return alreadyLoaded and not alreadyDelivered
+        
         return any(["Loaded on truck" in x[0] for x in self.status])
 
     def isDelivered(self):

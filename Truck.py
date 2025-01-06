@@ -69,7 +69,7 @@ class Truck:
         """
         if len(self.packageIDs) < self.capacity:
             package = pkgHashTable.lookup(packageID)
-            package.updateStatus("Loaded on truck", self.current_time)
+            package.updateStatus(f"Loaded on truck #{self.id}", self.current_time)
             self.packageIDs.append(packageID)
             return True
         return False

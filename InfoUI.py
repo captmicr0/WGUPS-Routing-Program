@@ -52,10 +52,40 @@ class InfoUI:
         self._waitToContinue()
 
     def _generateTimedReport(self, atTime):
+        self._clear()
+        print(f"""
+--------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---
+--------------------------------------------------
+------ Timed Report as of {(datetime.min + atTime).strftime("%I:%M %p")} ---------------
+--------------------------------------------------
+""")
         pass
 
     def _generateFullReport(self):
-        pass
+        self._clear()
+        print(f"""
+--------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---
+--------------------------------------------------
+------ Full Report -------------------------------
+--------------------------------------------------
+""")
+        totalMiles = sum([truck.mileage for truck in self.trucks])
+        print(f"Total Mileage Traveled by All Trucks: {totalMiles:.1f}")
+        print()
+
+        pkgReport = [None] * (max([pkg.id for bucket in self.pkgHashTable.table for _, pkg in bucket]) + 1)
+        for bucket in self.pkgHashTable.table:
+            for _, pkg in bucket:
+                pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
+                      f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " + \
+                      f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}"
+        for line in pkgReport:
+            if line:
+                print(line)
+        
+        self._waitToContinue()
 
     def packageStatus(self):
         self._clear()
@@ -68,12 +98,15 @@ class InfoUI:
 """)
         pkgCount = len([pkg for bucket in self.pkgHashTable.table for _, pkg in bucket])
         pkgID = int(input(f"Enter Package ID (1-{pkgCount}): "))
+
         atTime = self._inputTime()
         print()
+
         if atTime:
             print(self.pkgHashTable.lookup(pkgID).__str__(atTime))
         else:
             print(self.pkgHashTable.lookup(pkgID))
+        
         self._waitToContinue()
 
     def truckStatus(self):
@@ -86,12 +119,15 @@ class InfoUI:
 --------------------------------------------------
 """)
         truckID = int(input(f"Enter Truck ID (1-{len(self.trucks)}): ")) - 1
+
         atTime = self._inputTime()
         print()
+
         if atTime:
             print(self.trucks[truckID].__str__(atTime))
         else:
             print(self.trucks[truckID])
+        
         self._waitToContinue()
         
     def totalMileage(self):
@@ -105,14 +141,15 @@ class InfoUI:
         self._clear()
         atTime = self._inputTime()
         print()
+
         if atTime:
             totalMiles = 0
             for truck in self.trucks:
                 totalMiles += [x[0] for x in truck.status if x[1] <= atTime][-1]
-            print(f"Total Mileage Traveled by All Trucks at {(datetime.min + atTime).strftime("%I:%M %p")}: {totalMiles}")
+            print(f"Total Mileage Traveled by All Trucks at {(datetime.min + atTime).strftime("%I:%M %p")}: {totalMiles:.1f}")
         else:
             totalMiles = sum([truck.mileage for truck in self.trucks])
-            print(f"Total Mileage Traveled by All Trucks: {totalMiles}")
+            print(f"Total Mileage Traveled by All Trucks: {totalMiles:.1f}")
         self._waitToContinue()
     
     def _inputTime(self):
