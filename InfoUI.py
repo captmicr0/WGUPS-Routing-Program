@@ -86,7 +86,7 @@ class InfoUI:
         totalMiles = 0
         for truck in self.trucks:
             totalMiles += [x[0] for x in truck.mileage_log if x[1] <= atTime][-1]
-        print(f"Total Mileage Traveled by All Trucks at {(datetime.min + atTime).strftime("%I:%M %p")}: {totalMiles:.1f}")
+        print(f"Total Mileage Traveled by All Trucks at {(datetime.min + atTime).strftime("%I:%M %p")}: {totalMiles:4.1f}")
         print()
 
         pkgReport = [None] * (max([pkg.id for bucket in self.pkgHashTable.table for _, pkg in bucket]) + 1)
@@ -103,7 +103,7 @@ class InfoUI:
         # Per-Truck reporting
         for truckID in range(1, len(self.trucks) + 1):
             print("------------------------------------------------------")
-            print(f"--- Packages on Truck #{truckID} -- {self.trucks[truckID-1].mileage:4.1f} miles --------------")
+            print(f"--- Packages on Truck #{truckID} -- {sum([x[0] for x in self.trucks[truckID-1].mileage_log if x[1] <= atTime]):4.1f} miles --------------")
 
             for pkgID in truckPkgIDs[truckID]:
                 print(pkgReport[pkgID])
@@ -129,7 +129,7 @@ class InfoUI:
 ------------------------------------------------------
 """)
         totalMiles = sum([truck.mileage for truck in self.trucks])
-        print(f"Total Mileage Traveled by All Trucks: {totalMiles:.1f} miles")
+        print(f"Total Mileage Traveled by All Trucks: {totalMiles:4.1f} miles")
         print()
 
         pkgReport = [None] * (max([pkg.id for bucket in self.pkgHashTable.table for _, pkg in bucket]) + 1)
@@ -199,10 +199,10 @@ class InfoUI:
         atTime = self._inputTime()
         print()
         
-        print(self.trucks[truckID])
-        print()
 
         if atTime:
+            print(self.trucks[truckID].__str__(atTime))
+            print()
             pkgReport = [None] * (max([pkg.id for bucket in self.pkgHashTable.table for _, pkg in bucket]) + 1)
             truckPkgIDs = [[] for _ in range(len(self.trucks) + 1)]
             for bucket in self.pkgHashTable.table:
@@ -215,11 +215,13 @@ class InfoUI:
                     truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
             
             print("------------------------------------------------------")
-            print(f"--- Packages on Truck #{truckID+1} -- {self.trucks[truckID].mileage:4.1f} miles --------------")
+            print(f"--- Packages on Truck #{truckID} -- {sum([x[0] for x in self.trucks[truckID-1].mileage_log if x[1] <= atTime]):4.1f} miles --------------")
             for pkgID in truckPkgIDs[truckID+1]:
                 print(pkgReport[pkgID])
             print("------------------------------------------------------")
         else:
+            print(self.trucks[truckID])
+            print()
             pkgReport = [None] * (max([pkg.id for bucket in self.pkgHashTable.table for _, pkg in bucket]) + 1)
             truckPkgIDs = [[] for _ in range(len(self.trucks) + 1)]
             for bucket in self.pkgHashTable.table:
@@ -256,7 +258,7 @@ class InfoUI:
             totalMiles = 0
             for truck in self.trucks:
                 totalMiles += [x[0] for x in truck.mileage_log if x[1] <= atTime][-1]
-            print(f"Total Mileage Traveled by All Trucks at {(datetime.min + atTime).strftime("%I:%M %p")}: {totalMiles:.1f} miles")
+            print(f"Total Mileage Traveled by All Trucks at {(datetime.min + atTime).strftime("%I:%M %p")}: {totalMiles:4.1f} miles")
         else:
             totalMiles = sum([truck.mileage for truck in self.trucks])
             print(f"Total Mileage Traveled by All Trucks: {totalMiles:.1f} miles")
