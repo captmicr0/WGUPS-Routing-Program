@@ -49,7 +49,6 @@ class InfoUI:
             self._generateTimedReport(atTime)
         else:
             self._generateFullReport()
-        self._waitToContinue()
 
     def _generateTimedReport(self, atTime):
         self._clear()
@@ -60,7 +59,26 @@ class InfoUI:
 ------ Timed Report as of {(datetime.min + atTime).strftime("%I:%M %p")} ---------------
 --------------------------------------------------
 """)
-        pass
+        totalMiles = 0
+        for truck in self.trucks:
+            totalMiles += [x[0] for x in truck.mileage_log if x[1] <= atTime][-1]
+        print(f"Total Mileage Traveled by All Trucks at {(datetime.min + atTime).strftime("%I:%M %p")}: {totalMiles:.1f}")
+        print()
+
+        pkgReport = [None] * (max([pkg.id for bucket in self.pkgHashTable.table for _, pkg in bucket]) + 1)
+        for bucket in self.pkgHashTable.table:
+            for _, pkg in bucket:
+                alreadyLoaded = any(["Loaded on truck" in x[0] for x in pkg.status if x[1] <= atTime])
+                alreadyDelivered = any(["Delivered" in x[0] for x in pkg.status if x[1] <= atTime])
+                pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
+                      (alreadyLoaded and f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " or "Not Loaded        , ") + \
+                      (alreadyDelivered and f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}" or "Not Delivered")
+        
+        for line in pkgReport:
+            if line:
+                print(line)
+
+        self._waitToContinue()
 
     def _generateFullReport(self):
         self._clear()
@@ -81,6 +99,7 @@ class InfoUI:
                 pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
                       f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " + \
                       f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}"
+        
         for line in pkgReport:
             if line:
                 print(line)
@@ -145,7 +164,7 @@ class InfoUI:
         if atTime:
             totalMiles = 0
             for truck in self.trucks:
-                totalMiles += [x[0] for x in truck.status if x[1] <= atTime][-1]
+                totalMiles += [x[0] for x in truck.mileage_log if x[1] <= atTime][-1]
             print(f"Total Mileage Traveled by All Trucks at {(datetime.min + atTime).strftime("%I:%M %p")}: {totalMiles:.1f}")
         else:
             totalMiles = sum([truck.mileage for truck in self.trucks])
