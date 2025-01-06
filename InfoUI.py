@@ -1,6 +1,8 @@
 import re
 from datetime import datetime, timedelta
 
+### NEED TO IMPLEMENT PER-TRUCK GROUPING IN REPORTS
+
 class InfoUI:
     def __init__(self, pkgHashTable, trucks):
         self.pkgHashTable = pkgHashTable
