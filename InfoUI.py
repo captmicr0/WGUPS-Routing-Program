@@ -102,6 +102,7 @@ class InfoUI:
         for truckID in range(1, len(self.trucks) + 1):
             print("--------------------------------------------------------------------")
             print(f"--- Packages on Truck #{truckID} - {sum([x[0] for x in self.trucks[truckID-1].mileage_log if x[1] <= atTime]):4.1f} miles - As of {(datetime.min + atTime).strftime("%I:%M %p")} ------------")
+            print("--------------------------------------------------------------------")
 
             for pkgID in truckPkgIDs[truckID]:
                 print(pkgReport[pkgID])
@@ -142,6 +143,7 @@ class InfoUI:
         for truckID in range(1, len(self.trucks) + 1):
             print("--------------------------------------------------------------------")
             print(f"--- Packages on Truck #{truckID} -- {self.trucks[truckID-1].mileage:4.1f} miles ----------------------------")
+            print("--------------------------------------------------------------------")
             
             for pkgID in truckPkgIDs[truckID]:
                 print(pkgReport[pkgID])
@@ -212,6 +214,7 @@ class InfoUI:
             
             print("--------------------------------------------------------------------")
             print(f"--- Packages on Truck #{truckID} - {sum([x[0] for x in self.trucks[truckID-1].mileage_log if x[1] <= atTime]):4.1f} miles - As of {(datetime.min + atTime).strftime("%I:%M %p")} ------------")
+            print("--------------------------------------------------------------------")
             for pkgID in truckPkgIDs[truckID+1]:
                 print(pkgReport[pkgID])
             print("--------------------------------------------------------------------")
@@ -228,6 +231,7 @@ class InfoUI:
             
             print("--------------------------------------------------------------------")
             print(f"--- Packages on Truck #{truckID+1} -- {self.trucks[truckID].mileage:4.1f} miles ----------------------------")
+            print("--------------------------------------------------------------------")
             for pkgID in truckPkgIDs[truckID+1]:
                 print(pkgReport[pkgID])
             print("--------------------------------------------------------------------")
