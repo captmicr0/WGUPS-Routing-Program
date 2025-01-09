@@ -34,7 +34,7 @@ class Package:
         self.special_notes = special_notes
         self.expected_delivery = None
     
-    def __str__(self, until=timedelta(hours=24, minutes=00)):
+    def __str__(self, until=None):
         """
         Return a string representation of the Package.
 
@@ -45,12 +45,16 @@ class Package:
             A formatted string containing package ID and address details.
         """
         address, city, state, zip_code = self.getAddress(until).split(",")
+        trackingHistory = f"  Tracking History{f" until {(datetime.min + until).strftime("%I:%M %p")}" if until else ""}:\n"
+        if until:
+            trackingHistory += '\n'.join([f"    {(x[1]) and (datetime.min + x[1]).strftime("%I:%M %p") or "??:??"}: {x[0]}" for x in self.status if x[1] <= until])
+        else:
+            trackingHistory += '\n'.join([f"    {(x[1]) and (datetime.min + x[1]).strftime("%I:%M %p") or "??:??"}: {x[0]}" for x in self.status])
         return f"Package {self.id}:\n" + \
                 f"  {address}, {city}, {state} {zip_code}\n" + \
                 f"  {self.weight} KG, Deadline: {self.deadline and (datetime.min + self.deadline).strftime('%I:%M %p') or "EOD"}" + \
                 (len(self.special_notes) > 0 and f", Notes: {self.special_notes}\n" or "\n") + \
-                f"  Tracking History{(until != timedelta(hours=24, minutes=00)) and f" until {(datetime.min + until).strftime("%I:%M %p")}" or ""}:\n" + \
-                '\n'.join([f"    {(x[1]) and (datetime.min + x[1]).strftime("%I:%M %p") or "??:??"}: {x[0]}" for x in self.status if x[1] <= until])
+                trackingHistory
     
     def __repr__(self):
         """
@@ -145,9 +149,10 @@ class Package:
         self.city = city
         self.state = state
         self.zip_code = zip_code
+        self.status.append(["Delivery address updated", time])
         self.address_history.append([(self.address, self.city, self.state, self.zip_code), time])
     
-    def getAddress(self, time=None):
+    def getAddress(self, time=timedelta(hours=7, minutes=00)):
         if time is None:
             return ", ".join(map(str, self.address_history[-1][0])) if self.address_history else None
 

@@ -37,10 +37,10 @@ class Truck:
         """
         return f"Truck #{self.id}, Assigned Driver: {self.driver.id}\n" + \
                 f"  Speed {self.speed}, Capacity: {self.capacity}\n" + \
-                f"  Mileage: {self.mileage:4.1f}, Current Time: {(datetime.min + self.current_time).strftime("%I:%M %p")}\n"+ \
+                f"  Mileage: {self.mileage:06.1f}, Current Time: {(datetime.min + self.current_time).strftime("%I:%M %p")}\n"+ \
                 f"  Location: {self.current_location}\n" + \
                 f"  Mileage Log{(until != timedelta(hours=24, minutes=00)) and f" until {(datetime.min + until).strftime("%I:%M %p")}" or ""}:\n" + \
-                '\n'.join([f"    {(x[1]) and (datetime.min + x[1]).strftime("%I:%M %p") or "??:??"}: {x[0]:4.1f} miles" for x in self.mileage_log if x[1] < until]) #+ "\n" + \
+                '\n'.join([f"    {(x[1]) and (datetime.min + x[1]).strftime("%I:%M %p") or "??:??"}: {x[0]:06.1f} miles" for x in self.mileage_log if x[1] < until]) #+ "\n" + \
                 #f"  Current Load:\n" + \
                 #(','.join([f"    {pkgID}" for pkgID in self.packageIDs]) or "    Empty")
     

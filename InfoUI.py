@@ -78,12 +78,12 @@ class InfoUI:
                 pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
                     (alreadyLoaded and f"Loaded at {(datetime.min + [x[1] for x in pkg.status if 'Loaded on truck' in x[0]][0]).strftime('%I:%M %p')}, " or "Not Loaded , ") + \
                     (alreadyDelivered and f"Delivered at {(datetime.min + [x[1] for x in pkg.status if 'Delivered' in x[0]][0]).strftime('%I:%M %p')}" or "Not Delivered") + \
-                    f"\nAddress: {pkg.getAddress(atTime)}, Deadline: {pkg.deadline}"
+                    f"\n  Deadline: {pkg.deadline and (datetime.min + pkg.deadline).strftime('%I:%M %p') or "     EOD"}, Address: {pkg.getAddress()}"
             else:
                 pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
                     f"Loaded at {(datetime.min + [x[1] for x in pkg.status if 'Loaded on truck' in x[0]][0]).strftime('%I:%M %p')}, " + \
                     f"Delivered at {(datetime.min + [x[1] for x in pkg.status if 'Delivered' in x[0]][0]).strftime('%I:%M %p')}" + \
-                    f"\nAddress: {pkg.getAddress()}, Deadline: {pkg.deadline}"
+                    f"\n  Deadline: {pkg.deadline and (datetime.min + pkg.deadline).strftime('%I:%M %p') or "     EOD"}, Address: {pkg.getAddress()}"
             truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
         
         return pkgReport, truckPkgIDs
@@ -91,9 +91,9 @@ class InfoUI:
     def _print_truck_packages(self, truckID, pkgReport, truckPkgIDs, mileage, atTime=None):
         print("--------------------------------------------------------------------")
         if atTime:
-            print(f"--- Packages on Truck #{truckID} - {mileage:4.1f} miles - As of {(datetime.min + atTime).strftime('%I:%M %p')} ------------")
+            print(f"--- Packages on Truck #{truckID} - {mileage:06.1f} miles - As of {(datetime.min + atTime).strftime('%I:%M %p')} -----------")
         else:
-            print(f"--- Packages on Truck #{truckID} -- {mileage:4.1f} miles ----------------------------")
+            print(f"--- Packages on Truck #{truckID} -- {mileage:06.1f} miles ---------------------------")
         print("--------------------------------------------------------------------")
         for pkgID in truckPkgIDs[truckID]:
             print(pkgReport[pkgID])
@@ -105,12 +105,12 @@ class InfoUI:
 --------------------------------------------------------------------
 --- WGUPS Package Tracking and Delivery Status ---------------------
 --------------------------------------------------------------------
------- {'Timed' if atTime else 'Full '} Report {'as of ' + (datetime.min + atTime).strftime("%I:%M %p ") if atTime else '               '}---------------------------------
+------ {'Timed' if atTime else 'Full'} Report {'as of ' + (datetime.min + atTime).strftime("%I:%M %p ") if atTime else ('-' * (15 if atTime else 16))}---------------------------------
 --------------------------------------------------------------------
 """)
 
         totalMiles = sum([truck.mileage if not atTime else [x[0] for x in truck.mileage_log if x[1] <= atTime][-1] for truck in self.trucks])
-        print(f"Total Mileage Traveled by All Trucks{(' at ' + (datetime.min + atTime).strftime('%I:%M %p')) if atTime else ''}: {totalMiles:4.1f}")
+        print(f"Total Mileage Traveled by All Trucks{(' at ' + (datetime.min + atTime).strftime('%I:%M %p')) if atTime else ''}: {totalMiles:06.1f}")
         print()
 
         pkgReport, truckPkgIDs = self._generate_package_report(atTime)
@@ -174,7 +174,7 @@ class InfoUI:
             totalMiles = 0
             for truck in self.trucks:
                 totalMiles += [x[0] for x in truck.mileage_log if x[1] <= atTime][-1]
-            print(f"Total Mileage Traveled by All Trucks at {(datetime.min + atTime).strftime("%I:%M %p")}: {totalMiles:4.1f} miles")
+            print(f"Total Mileage Traveled by All Trucks at {(datetime.min + atTime).strftime("%I:%M %p")}: {totalMiles:06.1f} miles")
         else:
             totalMiles = sum([truck.mileage for truck in self.trucks])
             print(f"Total Mileage Traveled by All Trucks: {totalMiles:.1f} miles")
