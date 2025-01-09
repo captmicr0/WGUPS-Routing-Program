@@ -153,7 +153,7 @@ class Package:
         self.address_history.append([(self.address, self.city, self.state, self.zip_code), time])
     
     def getAddress(self, time=timedelta(hours=7, minutes=00)):
-        if time is None:
+        if time is None or len(self.address_history) == 1:
             return ", ".join(map(str, self.address_history[-1][0])) if self.address_history else None
 
         for i in range(1, len(self.address_history)):

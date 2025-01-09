@@ -77,13 +77,15 @@ class InfoUI:
                 alreadyDelivered = any(["Delivered" in x[0] for x in pkg.status if x[1] <= atTime])
                 pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
                     (alreadyLoaded and f"Loaded at {(datetime.min + [x[1] for x in pkg.status if 'Loaded on truck' in x[0]][0]).strftime('%I:%M %p')}, " or "Not Loaded , ") + \
-                    (alreadyDelivered and f"Delivered at {(datetime.min + [x[1] for x in pkg.status if 'Delivered' in x[0]][0]).strftime('%I:%M %p')}" or "Not Delivered") + \
-                    f"\n  Deadline: {pkg.deadline and (datetime.min + pkg.deadline).strftime('%I:%M %p') or "     EOD"}, Address: {pkg.getAddress()}"
+                    (alreadyDelivered and f"Delivered at {(datetime.min + [x[1] for x in pkg.status if 'Delivered' in x[0]][0]).strftime('%I:%M %p')}," or "Not Delivered,") + \
+                    f"Deadline: {pkg.deadline and (datetime.min + pkg.deadline).strftime('%I:%M %p') or "EOD"}\n" + \
+                    f"  Address: {pkg.getAddress()}"
             else:
                 pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
                     f"Loaded at {(datetime.min + [x[1] for x in pkg.status if 'Loaded on truck' in x[0]][0]).strftime('%I:%M %p')}, " + \
-                    f"Delivered at {(datetime.min + [x[1] for x in pkg.status if 'Delivered' in x[0]][0]).strftime('%I:%M %p')}" + \
-                    f"\n  Deadline: {pkg.deadline and (datetime.min + pkg.deadline).strftime('%I:%M %p') or "     EOD"}, Address: {pkg.getAddress()}"
+                    f"Delivered at {(datetime.min + [x[1] for x in pkg.status if 'Delivered' in x[0]][0]).strftime('%I:%M %p')}," + \
+                    f"Deadline: {pkg.deadline and (datetime.min + pkg.deadline).strftime('%I:%M %p') or "EOD"}\n" + \
+                    f"  Address: {pkg.getAddress()}"
             truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
         
         return pkgReport, truckPkgIDs
