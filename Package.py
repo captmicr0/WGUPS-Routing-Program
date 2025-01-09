@@ -27,6 +27,7 @@ class Package:
         self.city = city
         self.state = state
         self.zip_code = zip_code
+        self.address_history = [[(self.address, self.city, self.state, self.zip_code), status_time]]
         self.deadline = deadline
         self.weight = weight
         self.status = [[status,status_time]]
@@ -43,8 +44,9 @@ class Package:
         Returns:
             A formatted string containing package ID and address details.
         """
+        address, city, state, zip_code = self.getAddress(until).split(",")
         return f"Package {self.id}:\n" + \
-                f"  {self.address}, {self.city}, {self.state} {self.zip_code}\n" + \
+                f"  {address}, {city}, {state} {zip_code}\n" + \
                 f"  {self.weight} KG, Deadline: {self.deadline and (datetime.min + self.deadline).strftime('%I:%M %p') or "EOD"}" + \
                 (len(self.special_notes) > 0 and f", Notes: {self.special_notes}\n" or "\n") + \
                 f"  Tracking History{(until != timedelta(hours=24, minutes=00)) and f" until {(datetime.min + until).strftime("%I:%M %p")}" or ""}:\n" + \
@@ -70,8 +72,8 @@ class Package:
             status: New status of the package.
             time: Time of status update
         """
-        if [status, time] not in self.status:
-            self.status.append([status, time])
+        #if [status, time] not in self.status:
+        self.status.append([status, time])
     
     def isOnTruck(self, atTime=None):
         """
@@ -129,7 +131,7 @@ class Package:
             return timedelta(hours=10, minutes=20)
         return None
 
-    def updateAddress(self, address, city, state, zip_code):
+    def updateAddress(self, address, city, state, zip_code, time=None):
         """
         Update the address of the package.
 
@@ -143,3 +145,17 @@ class Package:
         self.city = city
         self.state = state
         self.zip_code = zip_code
+        self.address_history.append([(self.address, self.city, self.state, self.zip_code), time])
+    
+    def getAddress(self, time=None):
+        if time is None:
+            return ", ".join(map(str, self.address_history[-1][0])) if self.address_history else None
+
+        for i in range(1, len(self.address_history)):
+            previous_entry, previous_time = self.address_history[i - 1]
+            current_entry, current_time = self.address_history[i]
+
+            if previous_time <= time < current_time:
+                return ", ".join(map(str, previous_entry))
+        
+        return None

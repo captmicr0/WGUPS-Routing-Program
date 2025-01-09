@@ -58,4 +58,4 @@ router.deliverPackages(trucks)
 
 # Creates InfoUI instance and starts the UI menu loop
 ui = InfoUI(pkgHashTable, trucks)
-ui.mainMenuLoop()
+#ui.mainMenuLoop()

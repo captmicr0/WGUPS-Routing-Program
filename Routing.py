@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 class Routing:
     """
     An implementation to sort and load packages onto trucks.
@@ -92,7 +94,7 @@ class Routing:
             # This will only happen when the truck is able to load the package,
             # after 10:20 AM when the correect address is known
             if nearestPkg.id == 9:
-                nearestPkg.updateAddress("410 S State St", "Salt Lake City", "UT", 84111)
+                nearestPkg.updateAddress("410 S State St", "Salt Lake City", "UT", 84111, timedelta(hours=10,minutes=20))
                 # Resort, since the route will change due to the new address
                 self._resortTruckPacakges(truck)
             
@@ -104,6 +106,8 @@ class Routing:
                             truck.loadPackage(self.pkgHashTable, dependentPkg.id)
                     # Resort, since the dependent packages were not added in a sorted manner
                     self._resortTruckPacakges(truck)
+            
+            loadablePkgs = self._getLoadablePackages(truck)
     
     def _resortTruckPacakges(self, truck):
         """

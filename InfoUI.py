@@ -37,9 +37,9 @@ class InfoUI:
         if choice == 1:
             self.generateReport()
         elif choice == 2:
-            self.packageStatus()
+            self.displayStatus("Package")
         elif choice == 3:
-            self.truckStatus()
+            self.displayStatus("Truck")
         elif choice == 4:
             self.totalMileage()
         elif choice == 5:
@@ -63,179 +63,96 @@ class InfoUI:
 """)
         atTime = self._inputTime()
         if atTime:
-            self._generateTimedReport(atTime)
+            self._generate_report(atTime)
         else:
-            self._generateFullReport()
+            self._generate_report()
 
-    def _generateTimedReport(self, atTime):
-        """
-        Generate a report of package statuses at a specific time.
-
-        Args:
-            atTime: The time at which to generate the report.
-        """
-        self._clear()
-        print(f"""
---------------------------------------------------------------------
---- WGUPS Package Tracking and Delivery Status ---------------------
---------------------------------------------------------------------
------- Timed Report as of {(datetime.min + atTime).strftime("%I:%M %p")} ---------------------------------
---------------------------------------------------------------------
-""")
-        totalMiles = 0
-        for truck in self.trucks:
-            totalMiles += [x[0] for x in truck.mileage_log if x[1] <= atTime][-1]
-        print(f"Total Mileage Traveled by All Trucks at {(datetime.min + atTime).strftime("%I:%M %p")}: {totalMiles:4.1f}")
-        print()
-
+    def _generate_package_report(self, atTime=None):
         pkgReport = [None] * (max([pkg.id for pkg in self.pkgHashTable]) + 1)
         truckPkgIDs = [[] for _ in range(len(self.trucks) + 1)]
+        
         for pkg in self.pkgHashTable:
-            alreadyLoaded = any(["Loaded on truck" in x[0] for x in pkg.status if x[1] <= atTime])
-            alreadyDelivered = any(["Delivered" in x[0] for x in pkg.status if x[1] <= atTime])
-            pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
-                    (alreadyLoaded and f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " or "Not Loaded        , ") + \
-                    (alreadyDelivered and f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}" or "Not Delivered")
-            truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
-        
-        # Per-Truck reporting
-        for truckID in range(1, len(self.trucks) + 1):
-            print("--------------------------------------------------------------------")
-            print(f"--- Packages on Truck #{truckID} - {sum([x[0] for x in self.trucks[truckID-1].mileage_log if x[1] <= atTime]):4.1f} miles - As of {(datetime.min + atTime).strftime("%I:%M %p")} ------------")
-            print("--------------------------------------------------------------------")
-
-            for pkgID in truckPkgIDs[truckID]:
-                print(pkgReport[pkgID])
-        
-        # Global reporting
-        #for line in pkgReport:
-        #    if line:
-        #        print(line)
-
-        print("--------------------------------------------------------------------")
-        self._waitToContinue()
-
-    def _generateFullReport(self):
-        """
-        Generate a full report of package statuses for the entire day.
-        """
-        self._clear()
-        print(f"""
---------------------------------------------------------------------
---- WGUPS Package Tracking and Delivery Status ---------------------
---------------------------------------------------------------------
------- Full Report -------------------------------------------------
---------------------------------------------------------------------
-""")
-        totalMiles = sum([truck.mileage for truck in self.trucks])
-        print(f"Total Mileage Traveled by All Trucks: {totalMiles:4.1f} miles")
-        print()
-
-        pkgReport = [None] * (max([pkg.id for pkg in self.pkgHashTable]) + 1)
-        truckPkgIDs = [[] for _ in range(len(self.trucks) + 1)]
-        for pkg in self.pkgHashTable:
-            pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
-                    f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " + \
-                    f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}"
-            truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
-        
-        # Per-Truck reporting
-        for truckID in range(1, len(self.trucks) + 1):
-            print("--------------------------------------------------------------------")
-            print(f"--- Packages on Truck #{truckID} -- {self.trucks[truckID-1].mileage:4.1f} miles ----------------------------")
-            print("--------------------------------------------------------------------")
-            
-            for pkgID in truckPkgIDs[truckID]:
-                print(pkgReport[pkgID])
-        
-        # Global reporting
-        #for line in pkgReport:
-        #    if line:
-        #        print(line)
-        
-        print("--------------------------------------------------------------------")
-        self._waitToContinue()
-
-    def packageStatus(self):
-        """
-        Display the status of a specific package.
-        """
-        self._clear()
-        print("""
---------------------------------------------------------------------
---- WGUPS Package Tracking and Delivery Status ---------------------
---------------------------------------------------------------------
------- Package Status ----------------------------------------------
---------------------------------------------------------------------
-""")
-        pkgCount = len([pkg for pkg in self.pkgHashTable])
-        pkgID = int(input(f"Enter Package ID (1-{pkgCount}): "))
-
-        atTime = self._inputTime()
-        print()
-
-        if atTime:
-            print(self.pkgHashTable.lookup(pkgID).__str__(atTime))
-        else:
-            print(self.pkgHashTable.lookup(pkgID))
-        
-        self._waitToContinue()
-
-    def truckStatus(self):
-        """
-        Display the status of a specific truck.
-        """
-        self._clear()
-        print("""
---------------------------------------------------------------------
---- WGUPS Package Tracking and Delivery Status ---------------------
---------------------------------------------------------------------
------- Truck Status ------------------------------------------------
---------------------------------------------------------------------
-""")
-        truckID = int(input(f"Enter Truck ID (1-{len(self.trucks)}): ")) - 1
-
-        atTime = self._inputTime()
-        print()
-        
-
-        if atTime:
-            print(self.trucks[truckID].__str__(atTime))
-            print()
-            pkgReport = [None] * (max([pkg.id for pkg in self.pkgHashTable]) + 1)
-            truckPkgIDs = [[] for _ in range(len(self.trucks) + 1)]
-            for pkg in self.pkgHashTable:
+            if atTime:
                 alreadyLoaded = any(["Loaded on truck" in x[0] for x in pkg.status if x[1] <= atTime])
                 alreadyDelivered = any(["Delivered" in x[0] for x in pkg.status if x[1] <= atTime])
                 pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
-                    (alreadyLoaded and f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " or "Not Loaded        , ") + \
-                    (alreadyDelivered and f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}" or "Not Delivered")
-                truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
-            
-            print("--------------------------------------------------------------------")
-            print(f"--- Packages on Truck #{truckID} - {sum([x[0] for x in self.trucks[truckID-1].mileage_log if x[1] <= atTime]):4.1f} miles - As of {(datetime.min + atTime).strftime("%I:%M %p")} ------------")
-            print("--------------------------------------------------------------------")
-            for pkgID in truckPkgIDs[truckID+1]:
-                print(pkgReport[pkgID])
-            print("--------------------------------------------------------------------")
-        else:
-            print(self.trucks[truckID])
-            print()
-            pkgReport = [None] * (max([pkg.id for pkg in self.pkgHashTable]) + 1)
-            truckPkgIDs = [[] for _ in range(len(self.trucks) + 1)]
-            for pkg in self.pkgHashTable:
+                    (alreadyLoaded and f"Loaded at {(datetime.min + [x[1] for x in pkg.status if 'Loaded on truck' in x[0]][0]).strftime('%I:%M %p')}, " or "Not Loaded , ") + \
+                    (alreadyDelivered and f"Delivered at {(datetime.min + [x[1] for x in pkg.status if 'Delivered' in x[0]][0]).strftime('%I:%M %p')}" or "Not Delivered") + \
+                    f"\nAddress: {pkg.getAddress(atTime)}, Deadline: {pkg.deadline}"
+            else:
                 pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
-                    f"Loaded at {(datetime.min + [x[1] for x in pkg.status if "Loaded on truck" in x[0]][0]).strftime("%I:%M %p")}, " + \
-                    f"Delivered at {(datetime.min + [x[1] for x in pkg.status if "Delivered" in x[0]][0]).strftime("%I:%M %p")}"
-                truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
-            
-            print("--------------------------------------------------------------------")
-            print(f"--- Packages on Truck #{truckID+1} -- {self.trucks[truckID].mileage:4.1f} miles ----------------------------")
-            print("--------------------------------------------------------------------")
-            for pkgID in truckPkgIDs[truckID+1]:
-                print(pkgReport[pkgID])
-            print("--------------------------------------------------------------------")
+                    f"Loaded at {(datetime.min + [x[1] for x in pkg.status if 'Loaded on truck' in x[0]][0]).strftime('%I:%M %p')}, " + \
+                    f"Delivered at {(datetime.min + [x[1] for x in pkg.status if 'Delivered' in x[0]][0]).strftime('%I:%M %p')}" + \
+                    f"\nAddress: {pkg.getAddress()}, Deadline: {pkg.deadline}"
+            truckPkgIDs[pkg.isOnTruck()].append(pkg.id)
         
+        return pkgReport, truckPkgIDs
+
+    def _print_truck_packages(self, truckID, pkgReport, truckPkgIDs, mileage, atTime=None):
+        print("--------------------------------------------------------------------")
+        if atTime:
+            print(f"--- Packages on Truck #{truckID} - {mileage:4.1f} miles - As of {(datetime.min + atTime).strftime('%I:%M %p')} ------------")
+        else:
+            print(f"--- Packages on Truck #{truckID} -- {mileage:4.1f} miles ----------------------------")
+        print("--------------------------------------------------------------------")
+        for pkgID in truckPkgIDs[truckID]:
+            print(pkgReport[pkgID])
+        print("--------------------------------------------------------------------")
+    
+    def _generate_report(self, atTime=None):
+        self._clear()
+        print(f"""
+--------------------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---------------------
+--------------------------------------------------------------------
+------ {'Timed' if atTime else 'Full '} Report {'as of ' + (datetime.min + atTime).strftime("%I:%M %p ") if atTime else '               '}---------------------------------
+--------------------------------------------------------------------
+""")
+
+        totalMiles = sum([truck.mileage if not atTime else [x[0] for x in truck.mileage_log if x[1] <= atTime][-1] for truck in self.trucks])
+        print(f"Total Mileage Traveled by All Trucks{(' at ' + (datetime.min + atTime).strftime('%I:%M %p')) if atTime else ''}: {totalMiles:4.1f}")
+        print()
+
+        pkgReport, truckPkgIDs = self._generate_package_report(atTime)
+
+        for truckID in range(1, len(self.trucks) + 1):
+            mileage = self.trucks[truckID-1].mileage if not atTime else [x[0] for x in self.trucks[truckID-1].mileage_log if x[1] <= atTime][-1]
+            self._print_truck_packages(truckID, pkgReport, truckPkgIDs, mileage, atTime)
+
+        self._waitToContinue()
+
+    def displayStatus(self, statusType):
+        self._clear()
+        print(f"""
+--------------------------------------------------------------------
+--- WGUPS Package Tracking and Delivery Status ---------------------
+--------------------------------------------------------------------
+------ {statusType.ljust(7)} Status ----------------------------------------------
+--------------------------------------------------------------------
+""")
+
+        if statusType == "Package":
+            pkgCount = len([pkg for pkg in self.pkgHashTable])
+            itemID = int(input(f"Enter Package ID (1-{pkgCount}): "))
+        elif statusType == "Truck":
+            itemID = int(input(f"Enter Truck ID (1-{len(self.trucks)}): ")) - 1
+
+        atTime = self._inputTime()
+        print()
+
+        if statusType == "Package":
+            print(self.pkgHashTable.lookup(itemID).__str__(atTime) if atTime else self.pkgHashTable.lookup(itemID))
+        elif statusType == "Truck":
+            if atTime:
+                print(self.trucks[itemID].__str__(atTime))
+                pkgReport, truckPkgIDs = self._generate_package_report(atTime)
+                mileage = [x[0] for x in self.trucks[itemID].mileage_log if x[1] <= atTime][-1]
+                self._print_truck_packages(itemID + 1, pkgReport, truckPkgIDs, mileage, atTime)
+            else:
+                print(self.trucks[itemID])
+                pkgReport, truckPkgIDs = self._generate_package_report()
+                self._print_truck_packages(itemID + 1, pkgReport, truckPkgIDs, self.trucks[itemID].mileage)
+
         self._waitToContinue()
         
     def totalMileage(self):

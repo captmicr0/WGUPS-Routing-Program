@@ -99,12 +99,11 @@ class Truck:
         travel_time = distance / self.speed
         self.current_time += timedelta(hours=travel_time)
         self.mileage += distance
-        if [self.mileage, self.current_time] not in self.mileage_log:
-            self.mileage_log.append([self.mileage, self.current_time])
+        #if [self.mileage, self.current_time] not in self.mileage_log:
+        self.mileage_log.append([self.mileage, self.current_time])
         package.updateStatus("Delivered", self.current_time)
         self.packageIDs.remove(packageID)
         self.current_location = package.address
-
 
     def returnToHub(self, distance_to_hub):
         """
@@ -116,8 +115,8 @@ class Truck:
         travel_time = distance_to_hub / self.speed
         self.current_time += timedelta(hours=travel_time)
         self.mileage += distance_to_hub
-        if [self.mileage, self.current_time] not in self.mileage_log:
-            self.mileage_log.append([self.mileage, self.current_time])
+        #if [self.mileage, self.current_time] not in self.mileage_log:
+        self.mileage_log.append([self.mileage, self.current_time])
         self.current_location = "HUB"
 
     def getPackages(self, pkgHashTable):
