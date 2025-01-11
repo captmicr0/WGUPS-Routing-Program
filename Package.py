@@ -163,4 +163,4 @@ class Package:
             if previous_time <= time < current_time:
                 return ", ".join(map(str, previous_entry))
         
-        return None
+        return ", ".join(map(str, self.address_history[-1][0])) if self.address_history else None
