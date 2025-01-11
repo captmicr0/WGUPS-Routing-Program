@@ -31,7 +31,10 @@ class InfoUI:
 4. View Total Mileage
 5. Exit
 """)
-        choice = int(input("Enter your choice (1-5): "))
+        choice = input("Enter your choice (1-5): ")
+        
+        if len(choice):
+            choice = int(choice)
 
         # Call method based on user choice
         if choice == 1:
@@ -79,7 +82,7 @@ class InfoUI:
                     (alreadyLoaded and f"Loaded at {(datetime.min + [x[1] for x in pkg.status if 'Loaded on truck' in x[0]][0]).strftime('%I:%M %p')}, " or "Not Loaded , ") + \
                     (alreadyDelivered and f"Delivered at {(datetime.min + [x[1] for x in pkg.status if 'Delivered' in x[0]][0]).strftime('%I:%M %p')}," or "Not Delivered, ") + \
                     f"Deadline: {pkg.deadline and (datetime.min + pkg.deadline).strftime('%I:%M %p') or "EOD"}\n" + \
-                    f"    Address: {pkg.getAddress()}"
+                    f"    Address: {pkg.getAddress(atTime)}"
             else:
                 pkgReport[pkg.id] = f"Package #{pkg.id:02}: " + \
                     f"Loaded at {(datetime.min + [x[1] for x in pkg.status if 'Loaded on truck' in x[0]][0]).strftime('%I:%M %p')}, " + \

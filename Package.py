@@ -152,7 +152,7 @@ class Package:
         self.status.append(["Delivery address updated", time])
         self.address_history.append([(self.address, self.city, self.state, self.zip_code), time])
     
-    def getAddress(self, time=timedelta(hours=7, minutes=00)):
+    def getAddress(self, time=None):
         if time is None or len(self.address_history) == 1:
             return ", ".join(map(str, self.address_history[-1][0])) if self.address_history else None
 
